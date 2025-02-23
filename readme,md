@@ -1,0 +1,8 @@
+ssh-keygen -t rsa -b 4096 -f /home/beigi/myApp/MySshTools/key/id_rsa -C "sshToolsKey"
+
+
+
+F&eNU56C#p3U#uam9vZpcm#wDImrp49tucIoGR@ZB
+
+
+#F&eNU56C#p3U#uam9vZpcm#wDImrp49tucIoGR@ZB

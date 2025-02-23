@@ -1,0 +1,537 @@
+{
+    "title": "Ronix Server List",
+    "Group": [
+        {
+            "GroupName" : "vps",
+            "TitleColour": "MAGENTA",
+            "IpColour" : "light-MAGENTA",
+            "AliasColour" : "MAGENTA",
+            "CodeColour" : "light-MAGENTA",
+            "GroupColour" : "MAGENTA"
+        },
+        {
+            "GroupName" : "backup",
+            "TitleColour": "cyan",
+            "IpColour" : "cyan",
+            "AliasColour" : "cyan",
+            "CodeColour" : "cyan",
+            "GroupColour" : "cyan"
+        },
+        {
+            "GroupName" : "TMS/LMS",
+            "TitleColour": "MAGENTA",
+            "IpColour" : "light-MAGENTA",
+            "AliasColour" : "MAGENTA",
+            "CodeColour" : "light-MAGENTA",
+            "GroupColour" : "MAGENTA"
+        },  
+        {
+            "GroupName" : "CICD",
+            "TitleColour": "blue",
+            "IpColour" : "blue",
+            "AliasColour" : "light-blue",
+            "CodeColour" : "light-blue",
+            "GroupColour" : "blue"
+        },
+        {
+            "GroupName" : "STAGE",
+            "TitleColour": "Green",
+            "IpColour" : "light-green",
+            "AliasColour" : "green",
+            "CodeColour" : "light-green",
+            "GroupColour" : "Green"
+        },
+        {
+            "GroupName" : "DEV",
+            "TitleColour": "cyan",
+            "IpColour" : "cyan",
+            "AliasColour" : "light-cyan",
+            "CodeColour" : "light-cyan",
+            "GroupColour" : "cyan"
+        },
+        {
+            "GroupName" : "Site-Global",
+            "TitleColour": "red",
+            "IpColour" : "light-red",
+            "AliasColour" : "light-red",
+            "CodeColour" : "light-red",
+            "GroupColour" : "red"
+        },
+        {
+            "GroupName" : "LOCAL",
+            "TitleColour": "Green",
+            "IpColour" : "Green",
+            "AliasColour" : "light-Green",
+            "CodeColour" : "light-Green",
+            "GroupColour" : "Green"
+        },
+        {
+            "GroupName" : "Site-IR",
+            "TitleColour": "red",
+            "IpColour" : "red",
+            "AliasColour" : "red",
+            "CodeColour" : "Light-RED",
+            "GroupColour" : "red"
+        },
+        {
+            "GroupName" : "RONIX.SHOP",
+            "TitleColour": "MAGENTA",
+            "IpColour" : "MAGENTA",
+            "AliasColour" : "light-MAGENTA",
+            "CodeColour" : "light-MAGENTA",
+            "GroupColour" : "MAGENTA"
+        },
+        {
+            "GroupName" : "BI",
+            "TitleColour": "cyan",
+            "IpColour" : "cyan",
+            "AliasColour" : "light-cyan",
+            "CodeColour" : "light-cyan",
+            "GroupColour" : "cyan"
+        },
+        {
+            "GroupName" : "VoglerTools",
+            "TitleColour": "red",
+            "IpColour" : "red",
+            "AliasColour" : "red",
+            "CodeColour" : "Light-RED",
+            "GroupColour" : "red"
+        }
+            ],
+    "servers": [
+        {
+            "server_name": "Ronixtest.com",
+            "IP": "10.100.53.2",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "ronixtest",
+            "code": "53.2",
+            "Group" : "VPS"
+        },
+        {
+            "server_name": "Monitoring VPS",
+            "IP": "176.9.235.199",
+            "ssh_port": "49150",
+            "ssh_user": "root",
+            "alias": "Monitoring",
+            "code": "199",
+            "Group" : "VPS"
+        },
+        {
+            "server_name": "Backup - Site - 56 OLD",
+            "IP": "136.243.83.247",
+            "ssh_port": "3031",
+            "ssh_user": "root",
+            "alias": "56,230",
+            "code": "247",
+            "Group" : "Backup"
+        },
+        {
+            "server_name": "Backup - WordPress",
+            "IP": "10.100.8.14",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "WP Backup",
+            "code": "14",
+            "Group" : "Backup"
+        },
+        { 
+            "server_name": "BigBlueButton",
+            "IP": "10.1.8.177",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "vclass",
+            "code": "bbb",
+            "Group" : "TMS/LMS"
+        },
+        {
+            "server_name": "TMS Server",
+            "IP": "10.1.8.11",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "TMS Dashboard",
+            "code": "tms",
+            "Group" : "TMS/LMS"
+        },
+        {
+            "server_name": "Docker Registry",
+            "IP": "10.1.8.93",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Docker HUB",
+            "code": "hub",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "Attlasian toolchain",
+            "IP": "10.1.8.58",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Jira/Bitbucket",
+            "code": "jira",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "Jira Server",
+            "IP": "10.1.8.204",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Jira",
+            "code": "204",
+            "Group" : "CICD"
+        },
+
+        {
+            "server_name": "Confluence Server",
+            "IP": "10.1.8.55",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Notice",
+            "code": "wiki",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "Bamboo Server",
+            "IP": "10.1.8.95",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "BamBoo",
+            "code": "bamboo",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "Pipeline Agent IR",
+            "IP": "10.1.8.59",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Agent IR",
+            "code": "agentir",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "Pipeline Agent DE",
+            "IP": "10.100.8.7",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Agent DE",
+            "code": "agent",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "Test Agent",
+            "IP": "10.1.8.200",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "test",
+            "code": "200",
+            "Group" : "CICD"
+        },
+        {
+            "server_name": "STAGE WordPress",
+            "IP": "10.1.8.57",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "CentOS",
+            "code": "57",
+            "Group" : "Stage"
+        },
+        {
+            "server_name": "STAGE Website",
+            "IP": "10.100.8.8",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "STAGE",
+            "code": "8.8",
+            "Group" : "Stage"
+        },
+        {
+            "server_name": "Stage Landing",
+            "IP": "10.1.8.87",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Landing",
+            "code": "8.87",
+            "Group" : "Stage"
+        },
+        {
+            "server_name": "Development Server",
+            "IP": "10.1.8.180",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "DEV Server",
+            "code": "180",
+            "Group" : "DEV"
+        },
+        {
+            "server_name": "Stage Server",
+            "IP": "10.1.8.181",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Stage Server",
+            "code": "181",
+            "Group" : "DEV"
+        },
+        {
+            "server_name": "Dev Database",
+            "IP": "10.1.8.47",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "dev-DB",
+            "code": "8.47",
+            "Group" : "DEV"
+        },
+        {
+            "server_name": "Dev Redis",
+            "IP": "10.1.8.48",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "dev-redis",
+            "code": "8.48",
+            "Group" : "DEV"
+        },
+        {
+            "server_name": "Primary SITE",
+            "IP": "10.100.52.2",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "site",
+            "code": "52.2",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Site Database",
+            "IP": "10.100.8.4",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "DB",
+            "code": "8.4",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Site Redis",
+            "IP": "10.100.8.3",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "redis",
+            "code": "8.3",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Blog Website (WordPress)",
+            "IP": "10.100.8.5",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Blog",
+            "code": "8.5",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Panel-Admin (Dashboard)",
+            "IP": "10.100.8.6",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "admin.ronixtools",
+            "code": "adm",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Kaltura NGINX Globla Streaming",
+            "IP": "10.100.52.13",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Streaming",
+            "code": "stream",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Mongo DB Germany (SRVGV16)",
+            "IP": "10.100.8.16",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "mongo-Global",
+            "code": "8.16",
+            "Group" : "Site-Global"
+        },
+        {
+            "server_name": "Media Server IR",
+            "IP": "10.1.52.124",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "FileServer",
+            "code": "124",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "Backgroud Serverice",
+            "IP": "10.1.16.126",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "BK Serveice",
+            "code": "126",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "DB Center (SRVIV127)",
+            "IP": "10.1.20.127",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "DBCenter",
+            "code": "127",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "Web Monitoring",
+            "IP": "10.1.8.7",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Monitoring",
+            "code": "8.7",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "Monitoring ELK (SRVIV142)",
+            "IP": "10.1.8.142",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "ELK",
+            "code": "elk",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "Cloud Api - CASP",
+            "IP": "10.1.16.149",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "CASP",
+            "code": "casp",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "Ansible Controller",
+            "IP": "10.1.8.176",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "ansible",
+            "code": "ans",
+            "Group" : "LOCAL"
+        },
+        {
+            "server_name": "Mongo DB IRAN (SRVIV201)",
+            "IP": "10.1.20.201",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "mongo-ir",
+            "code": "201",
+            "Group" : "LOCAL"
+        },
+
+        {
+            "server_name": "Web Site Primary Server",
+            "IP": "10.1.52.120",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "site-ir",
+            "code": "52.120",
+            "Group" : "Site-IR"
+        },
+        {
+            "server_name": "Redis Website IR (SRVIV122)",
+            "IP": "10.1.52.122",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "redisir",
+            "code": "52.122",
+            "Group" : "Site-IR"
+        },
+        {
+            "server_name": "Database Website IR (SRVIV121)",
+            "IP": "10.1.20.121",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "DB-IR",
+            "code": "20.121",
+            "Group" : "Site-IR"
+        },
+        {
+            "server_name": "Panel-Admin (Dashboard), (SRVIV123)",
+            "IP": "10.1.8.123",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "admin.roni.ir",
+            "code": "8.123",
+            "Group" : "Site-IR"
+        },
+        {
+            "server_name": "Kaltura Nginx - IR, (SRVIV147)",
+            "IP": "10.1.52.147",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "IR-STREAM",
+            "code": "52.147",
+            "Group" : "Site-IR"
+        },
+        {
+            "server_name": "Panel, DB, Redis (srviv189)",
+            "IP": "10.1.20.189",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Shop2",
+            "code": "189",
+            "Group" : "ronix.shop"
+        },
+        {
+            "server_name": "Web, api (srviv190)",
+            "IP": "10.1.52.190",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Shop2",
+            "code": "190",
+            "Group" : "ronix.shop"
+        },   
+        {
+            "server_name": "RonixDW - (SRVIV192)",
+            "IP": "10.1.20.192",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "BI-DW",
+            "code": "192",
+            "Group" : "BI"
+        },  
+        {
+            "server_name": "RonixML - (SRVIV193)",
+            "IP": "10.1.16.193",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "BI-ML",
+            "code": "193",
+            "Group" : "BI"
+        },
+        {
+            "server_name": "Website, Api, Streaming (srvgv19)",
+            "IP": "10.100.53.1",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "WEB",
+            "code": "53.1",
+            "Group" : "VoglerTools"
+        },
+        {
+            "server_name": "DB, Redis, (srvgv20)",
+            "IP": "10.100.9.1",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "DB",
+            "code": "9.1",
+            "Group" : "VoglerTools"
+        },
+        {
+            "server_name": "Panel, Stage, ,Mongo (srvgv21)",
+            "IP": "10.100.9.2",
+            "ssh_port": "22",
+            "ssh_user": "root",
+            "alias": "Panel",
+            "code": "9.2",
+            "Group" : "VoglerTools"
+        }
+    ]
+}
