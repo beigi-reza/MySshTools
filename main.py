@@ -6,17 +6,12 @@ import scp
 import signal
 import os
 import core
+import sys
+import tunnel
 from core import current_directory,JsonListFile,ServerConfigFile,SERVER_LIST,SSHKEY
 
 COLOR_LIST = ['_fw','_fy','_fb','_fbl','_fr','_fc','_fg','_fm','_fEx_w','_fEx_y','_fEx_b','_fEx_bl','_fEx_r','_fEx_c','_fEx_g','_fEx_m']
 
-#current_directory = os.path.dirname(os.path.realpath(__file__))
-#JsonListFile = os.path.join(current_directory,'conf/config.json')
-#JsonConfig = lib.BaseFunction.LoadJsonFile(JsonListFile)
-#ServerConfigFile = os.path.join(current_directory,'conf/ServerList.json')
-#SERVER_LIST = lib.BaseFunction.LoadJsonFile(ServerConfigFile)["servers"]
-#TAG_VIEW = lib.BaseFunction.GetValue(JsonConfig,"Tag_View",verbus=False,ReturnValueForNone=False)
-#SSHKEY = lib.BaseFunction.GetValue(JsonConfig,"SSHKEY",verbus=False,ReturnValueForNone='')
 MatthedServer = 'ALL'
 
 _B = "[1m"
@@ -88,6 +83,7 @@ def ConnectMenu(ServerCode):
             print(f'\n{_fr}Invalid Command{_reset}')
             lib.BaseFunction.PressEnterToContinue()            
 
+
 def MainMenu(msg=''):
     _SrvList = None
     UserInput = ''
@@ -118,8 +114,19 @@ def MainMenu(msg=''):
                 if _CopdeFoundInServerlist:
                     return _code.lower().strip()
                 else:
-                    _SrvList = 'ALL'                                
-            else:
+                    _SrvList = 'ALL'
+            else:                
+                try:
+                    InputNumber = int(UserInput)
+                    if InputNumber < len(_SrvList):
+                        if len(_SrvList) < 10:
+                            _x = 1 
+                            for _ in _SrvList:
+                                if _x == InputNumber:
+                                    return _SrvList[_x-1]
+                                _x = _x+1                                
+                except:
+                    pass
                 _SrvList = core.FindServers(UserInput)
                 if len(_SrvList) == 0:
                     msg = f'{_fr}No server found{_reset}'
@@ -127,8 +134,52 @@ def MainMenu(msg=''):
                     return _SrvList[0]                                    
         _CopdeFoundInServerlist = False
 
-def MainMenuLuncher():
-    ServerCode = MainMenu()
+def SearchCodeInParameterMode(UserInput):
+    _SrvList = None
+    while True:
+        lib.BaseFunction.clearScreen()
+        lib.Logo.SshToolsLogo()        
+        _SrvList = core.FindServers(UserInput)
+        if len(_SrvList) == 0:
+            return None
+        elif len(_SrvList) == 1:
+            return _SrvList[0]
+        else:
+            core.PrintServerList(_SrvList)            
+            
+            if UserInput.strip() in _SrvList:
+                _code = UserInput
+                print(f'{_N}{_fw}\nfor Quit ( {_D}ctrl + c{_N} ) or ( {_D}q{_N} ){_reset}')
+                UserInput = input(f'{_B}{_fw}Press {_fr}ENTER{_fw} for [ {_br}  {_code}  {_reset}{_fw} ] or Type for servers : {_reset}')                        
+                if UserInput.lower().strip() == 'q':
+                    lib.BaseFunction.FnExit()
+                else:
+                    if UserInput.strip() == '':
+                        return _code.lower().strip()
+            else:
+                print(f'{_N}{_fw}\nfor Quit ( {_D}ctrl + c{_N} ) or ( {_D}q{_N} ){_reset}')
+                UserInput = input(f'{_B}{_fw}Type for servers: {_reset}')
+                try:
+                    InputNumber = int(UserInput)
+                    if InputNumber < len(_SrvList):
+                        if len(_SrvList) < 10:
+                            _x = 1 
+                            for _ in _SrvList:
+                                if _x == InputNumber:
+                                    return _SrvList[_x-1]
+                                _x = _x+1                                
+                except:
+                    pass
+
+
+def MainMenuLuncher(UserParameter = ''):
+    if UserParameter == '':
+        ServerCode = MainMenu()
+    else:
+        ServerCode = SearchCodeInParameterMode(UserParameter)
+        if ServerCode == None:
+            lib.AsciArt.BorderIt(Text=f'No server were found to match your search',BorderColor=_fr,TextColor=_fw)
+            lib.BaseFunction.FnExit()
     UserCommand ,ServerLst = ConnectMenu(ServerCode)
     if UserCommand == 's':
         ConnectSSH(ServerLst)
@@ -136,7 +187,9 @@ def MainMenuLuncher():
         scp.ScpMenu(ServerLst)
     elif UserCommand == 't':
         print(f'\n{_fr}Tunnel{_reset}')
+        tunnel.printTunnlelist()
     lib.BaseFunction.PressEnterToContinue()
+
 
 def ConnectSSH(ServerLst):
     Ip = ServerLst["IP"]
@@ -180,10 +233,15 @@ def ChecCodeIUniq():
 
 signal.signal(signal.SIGINT, lib.BaseFunction.handler)
 
+#_debug = ['zzz']
+#sys.argv.extend(_debug)
 
 
 
 if __name__ == "__main__":
     if ChecCodeIUniq() is False:
-        lib.BaseFunction.FnExit()
-    Start()
+        lib.BaseFunction.FnExit()    
+    if len(sys.argv) == 1:        
+        Start()
+    else:
+        MainMenuLuncher(sys.argv[1])

@@ -1,4 +1,3 @@
-from pydoc import text
 import lib.AsciArt
 import lib.BaseFunction
 import lib.Logo

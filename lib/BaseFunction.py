@@ -7,6 +7,7 @@
 # Update GetValue - 1403-09-03
 
 import json
+from tabnanny import verbose
 from colorama import Fore, Back, Style
 from datetime import datetime
 import sys
@@ -54,16 +55,21 @@ def clearScreen():
 
 
 ## Load Json File and return it as Dictionary
-def LoadJsonFile(JsonFile): 
-   try:
-     JsFile = open(JsonFile, "r")
-   except:
-     print(Style.BRIGHT + Fore.RED + "Json File Not Found [ " + Fore.WHITE + JsonFile + Fore.RED + " ] " + Style.RESET_ALL)  
-     sys.exit()    
-   js = JsFile.read()
-   js  = js.replace('\n', '') 
-   global JsonConfig   
-   return json.loads(js)
+def LoadJsonFile(JsonFile,Verbus = True,ReternValueForFileNotFound = None): 
+    try:
+        JsFile = open(JsonFile, "r")
+    except:
+        if Verbus:
+            print(Style.BRIGHT + Fore.RED + "Json File Not Found [ " + Fore.WHITE + JsonFile + Fore.RED + " ] " + Style.RESET_ALL)            
+            sys.exit()
+        else:
+            return ReternValueForFileNotFound
+          
+            
+    js = JsFile.read()
+    js  = js.replace('\n', '') 
+    global JsonConfig   
+    return json.loads(js)
 
 
 def FnCreateDirectory(your_directory:str,Verbus = True):

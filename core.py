@@ -7,11 +7,17 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 JsonListFile = os.path.join(current_directory,'conf/config.json')
 JsonConfig = lib.BaseFunction.LoadJsonFile(JsonListFile)
 ServerConfigFile = os.path.join(current_directory,'conf/ServerList.json')
+TunnelDict = os.path.join(current_directory,'conf/tunnel.json')
 SERVER_LIST = lib.BaseFunction.LoadJsonFile(ServerConfigFile)["servers"]
 TAG_VIEW = lib.BaseFunction.GetValue(JsonConfig,"Tag_View",verbus=False,ReturnValueForNone=False)
 SSHKEY = lib.BaseFunction.GetValue(JsonConfig,"SSHKEY",verbus=False,ReturnValueForNone='')
-
-
+TUNNEL_LIST = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelDict,Verbus=False,ReternValueForFileNotFound={})
+HIGHLY_RESTRICTED_NETWORKS = lib.BaseFunction.GetValue(TUNNEL_LIST,'Highly_Restricted_Networks',verbus=False,ReturnValueForNone={})
+if TUNNEL_LIST == {}:
+    RunAsSudo = False 
+else:
+    RunAsSudo = TUNNEL_LIST["RunAsSudo"]
+    TUNNEL_LIST = TUNNEL_LIST["tunnel"]
 
 ######################################################
 ######################################################
@@ -102,7 +108,7 @@ def PrintServerList(ServersList):
         _lenIP = 24
         _lenTags = 0
         _lenCode = 15
-
+    _Count = 1
     TitleHeaderStr = f"{_B}{_bb}{_fw}{lib.AsciArt.FnAlignmentStr(originalString='Server Name',AlignmentMode='left',target_length=_lenName)}{_reset}"
     IpHeaderStr = f"{_B}{_bb}{_fw}{lib.AsciArt.FnAlignmentStr(originalString='IP',AlignmentMode='left',target_length=_lenIP)}{_reset}"
     TagsHeaderStr = f"{_B}{_bb}{_fw}{lib.AsciArt.FnAlignmentStr(originalString='Tags',AlignmentMode='left',target_length=_lenTags)}{_reset}"
@@ -116,7 +122,7 @@ def PrintServerList(ServersList):
             GroupNameStr = f"{_fy}{lib.AsciArt.FnAlignmentStr(originalString=_gruop,AlignmentMode='left',target_length=55)}{_reset}"            
             print(f"\n{GroupNameStr}")            
             for _Server in SERVER_LIST:            
-                if _Server["Group"] == _gruop:
+                if _Server["Group"] == _gruop:                    
                     PrintServerLine(_Server,lenName=_lenName,lenIP=_lenIP,lenTags=_lenTags,lenCode=_lenCode)
         else:
             Founded = False
@@ -127,25 +133,30 @@ def PrintServerList(ServersList):
                             Founded = True
                             GroupNameStr = f"{_fy}{lib.AsciArt.FnAlignmentStr(originalString=_gruop,AlignmentMode='left',target_length=55)}{_reset}"
                             print(f"\n{GroupNameStr}")
-                        PrintServerLine(_Server,lenName=_lenName,lenIP=_lenIP,lenTags=_lenTags,lenCode=_lenCode)
+                        PrintServerLine(_Server,lenName=_lenName,lenIP=_lenIP,lenTags=_lenTags,lenCode=_lenCode,LineNumber=_Count)
+                        _Count += 1
                             
     if TAG_VIEW:
         print(f"\n\n{TitleHeaderStr} {IpHeaderStr} {CodeHeaderStr} {TagsHeaderStr}{_reset}")
     else:
         print(f"\n\n{TitleHeaderStr} {IpHeaderStr} {CodeHeaderStr}{_reset}")
         
-def PrintServerLine(ServerDict,lenName,lenIP,lenTags,lenCode):
+def PrintServerLine(ServerDict,lenName,lenIP,lenTags,lenCode,LineNumber=0):
     Icon = ServerDict["Icon"]
     if Icon == '':
-        Icon = ' '        
+        Icon = ' '
+    if LineNumber > 0:
+        LineNumberStr = f"{_B}{_fy}{LineNumber}.{_reset}"
+    else:
+        LineNumberStr = ''
     _ServerName = lib.AsciArt.FnAlignmentStr(originalString=ServerDict["ServerName"],AlignmentMode='left',target_length=lenName)
     _ServerIP = lib.AsciArt.FnAlignmentStr(originalString=ServerDict["IP"],AlignmentMode='left',target_length=lenIP)
     _ServerTags = lib.AsciArt.FnAlignmentStr(originalString=str(ServerDict["Tags"]).upper(),AlignmentMode='left',target_length=lenTags)
     _ServerCode = lib.AsciArt.FnAlignmentStr(originalString=ServerDict["Code"],AlignmentMode='left',target_length=lenCode)
     if TAG_VIEW:
-        print(f"{_fw}{Icon} {_ServerName} {_ServerIP} {_B}{_fy}{_ServerCode}{_reset} {_D}{_fb}{_ServerTags} {_reset}")
+        print(f"{_fw}{LineNumberStr} {Icon} {_ServerName} {_ServerIP} {_B}{_fy}{_ServerCode}{_reset} {_D}{_fb}{_ServerTags} {_reset}")
     else:    
-        print(f"{_fw}{Icon} {_ServerName} {_ServerIP} {_B}{_fy}{_ServerCode}{_reset} {_reset}")        
+        print(f"{_fw}{LineNumberStr} {Icon} {_ServerName} {_ServerIP} {_B}{_fy}{_ServerCode}{_reset} {_reset}")        
         
 def printServerInfo(ServerCode):
     try:
