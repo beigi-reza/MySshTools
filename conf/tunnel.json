@@ -4,18 +4,19 @@
         "Enable" : true,
         "ExitOnForwardFailure" :"yes",
         "ServerAliveInterval":60,
-        "ServerAliveCountMax":3
+        "ServerAliveCountMax":3,
+        "MonitorPort": 2000
     },
     "tunnel": [
         {
             "Name": "HFS Download",
-            "Code": "s56",
+            "Code": "56",
             "ssh_ip" : "136.243.83.247",
             "ssh_user" : "root",
             "ssh_port" : "3031",            
-            "FinalPort": "3120",
+            "FinalPort": "80",
             "Local_or_Rempte_server": "localhost",
-            "Local_or_Rempte_port": "8080",
+            "Local_or_Rempte_port": "80",
             "Type" : "local"
         },
         {

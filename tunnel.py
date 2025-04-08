@@ -20,13 +20,15 @@ if HIGHLY_RESTRICTED_NETWORKS == {}:
     HighlyRestrictedNetworksEnable = False
     ExitOnForwardFailure = ''
     ServerAliveInterval = 0
-    ServerAliveCountMax = 0        
+    ServerAliveCountMax = 0
+    MonitorPort = 0
 else:
     HighlyRestrictedNetworksEnable = lib.BaseFunction.GetValue(HIGHLY_RESTRICTED_NETWORKS,'Enable',verbus=False,ReturnValueForNone=False)
-    if HighlyRestrictedNetworksEnable:
-        ExitOnForwardFailure = lib.BaseFunction.GetValue(HIGHLY_RESTRICTED_NETWORKS,'ExitOnForwardFailure',verbus=False,ReturnValueForNone='yes')
-        ServerAliveInterval = lib.BaseFunction.GetValue(HIGHLY_RESTRICTED_NETWORKS,'ServerAliveInterval',verbus=False,ReturnValueForNone=60)
-        ServerAliveCountMax = lib.BaseFunction.GetValue(HIGHLY_RESTRICTED_NETWORKS,'ServerAliveCountMax',verbus=False,ReturnValueForNone=3)
+    if HighlyRestrictedNetworksEnable:        
+        ExitOnForwardFailure = HIGHLY_RESTRICTED_NETWORKS.get('ExitOnForwardFailure','yes')
+        ServerAliveInterval = HIGHLY_RESTRICTED_NETWORKS.get('ServerAliveInterval',60)
+        ServerAliveCountMax = HIGHLY_RESTRICTED_NETWORKS.get('ServerAliveCountMax',3)
+        MonitorPort = HIGHLY_RESTRICTED_NETWORKS.get('MonitorPort',0)
     else:
         ExitOnForwardFailure = ''
         ServerAliveInterval = 0
@@ -209,19 +211,68 @@ To run in `Highly Restricted Networks Mode`, you need the `autossh` program. Fir
             lib.BaseFunction.FnExit()
 
             
-def CreateCommamd(TunnleDict,TypeOfTunnel):
-    Ssh_Command = []
-    if TypeOfTunnel == 'local':
-        if HighlyRestrictedNetworksEnable:
-            Ssh_Command.append('autossh')
-            
-            
+def CreateCommamd(TunnleDict,TypeOfTunnel):    
+    if HighlyRestrictedNetworksEnable:
+        _sshCommandMode = 'autossh'        
+    else:    
+        _sshCommandMode = 'ssh'
+
+    if TypeOfTunnel == 'local':        
+        _SSHType = '-L'
+        _SSHTypeServer = f"{TunnleDict['Local_or_Rempte_port']}:localhost:{TunnleDict['FinalPort']}"
+    elif TypeOfTunnel == 'remote':
+        _SSHType = '-R'
+        _SSHTypeServer = f"{TunnleDict['FinalPort']}:localhost:{TunnleDict['Local_or_Rempte_port']}"
+    elif TypeOfTunnel == 'dynamic':
+        _SSHType = '-R' 
+        _SSHTypeServer = f"{TunnleDict['FinalPort']}"        
+    
+
+    CommandLst = []    
+    if RunAsSudo:
+        CommandLst.append('sudo')
+    CommandLst.append(_sshCommandMode)
+    CommandLst.append('-M')
+    CommandLst.append(str(MonitorPort))
+    CommandLst.append('-N')
+    CommandLst.append(_SSHType)
+    CommandLst.append(_SSHTypeServer)
+    CommandLst.append('-p')
+    CommandLst.append(str(TunnleDict.get('ssh_port','22')))
+    CommandLst.append('-i')
+    CommandLst.append(SSHKEY)
+    CommandLst.append('-o')
+    CommandLst.append(f"ServerAliveInterval={ServerAliveInterval}")
+    CommandLst.append('-o')
+    CommandLst.append(f"ServerAliveCountMax={ServerAliveCountMax}")
+    CommandLst.append('-o')
+    CommandLst.append(f"ExitOnForwardFailure={ExitOnForwardFailure}")
+    CommandLst.append(f"{TunnleDict['ssh_user']}@{TunnleDict['ssh_ip']}")
+
+
+#    CommandLst = [
+#    _sshCommandMode,
+#    "-M",str(MonitorPort),
+#    "-N",
+#    f"{_SSHType}",f"{_SSHTypeServer}",
+#    "-p",f"{str(TunnleDict.get('ssh_port','22'))}",
+#    "-i",f"{SSHKEY}",
+#    "-o",f"ServerAliveInterval={ServerAliveInterval}",
+#    "-o",f"ServerAliveCountMax={ServerAliveCountMax}",
+#    "-o",f"ExitOnForwardFailure={ExitOnForwardFailure}",
+#    f"{TunnleDict['ssh_user']}@{TunnleDict['ssh_ip']}"
+#    ]
+    return CommandLst
 
 
 def FnStartTunnel(TunnleDict):
-    a = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())
-        
-    
+    Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())
+    print(Command)
+    process = subprocess.Popen(Command)
+    retcode = process.poll()
+    Pid = process.pid
+    WritePIDToFile(Pid, TunnleDict['Name'])
+    print(f"Tunnel PID : {Pid}")
 
 def CheckStatusTunnel(TunnelName):    
     return False
@@ -237,6 +288,11 @@ def CheckAutoSSHCommand():
         return None  # Or raise an exception, depending on your needs.
     except FileNotFoundError:        
         return False
+    
+def WritePIDToFile(Pid, TunnelName):
+    PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
+    with open(PidFile, 'w') as f:
+        f.write(str(Pid))
 
 signal.signal(signal.SIGINT, lib.BaseFunction.handler)
 
