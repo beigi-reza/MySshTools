@@ -290,6 +290,8 @@ def CheckAutoSSHCommand():
         return False
     
 def WritePIDToFile(Pid, TunnelName):
+    if os.path.join(current_directory, 'Pids') not in os.listdir(current_directory):
+        os.makedirs(os.path.join(current_directory, 'Pids'))
     PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
     with open(PidFile, 'w') as f:
         f.write(str(Pid))
