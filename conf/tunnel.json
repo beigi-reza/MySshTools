@@ -1,7 +1,7 @@
 {
-    "RunAsSudo" : true,
+    "RunAsSudo" : false,
     "Highly_Restricted_Networks":{
-        "Enable" : true,
+        "Enable" : false,
         "ExitOnForwardFailure" :"yes",
         "ServerAliveInterval":60,
         "ServerAliveCountMax":3,
@@ -17,7 +17,7 @@
             "FinalPort": "80",
             "Local_or_Rempte_server": "localhost",
             "Local_or_Rempte_port": "80",
-            "Type" : "local"
+            "Type" : "remote"
         },
         {
             "Name": "Test Web 180",

@@ -30,10 +30,10 @@ else:
         ServerAliveCountMax = HIGHLY_RESTRICTED_NETWORKS.get('ServerAliveCountMax',3)
         MonitorPort = HIGHLY_RESTRICTED_NETWORKS.get('MonitorPort',0)
     else:
-        ExitOnForwardFailure = ''
+        ExitOnForwardFailure = 'no'
         ServerAliveInterval = 0
         ServerAliveCountMax = 0        
-    
+        MonitorPort = 0    
 
 _B = "[1m"
 _N = "[22m"
@@ -169,7 +169,7 @@ def GenerateTunnelLine(Tunnel):
         _tColor = _fw
         _FinalIP = ' - '
         
-    if CheckStatusTunnel(Tunnel['Name']):
+    if CheckStatusTunnel(Tunnel):
         _Icon = '▶️'        
         _FinalPort = f'{_Icon}  {_FinalIP}:{Tunnel["FinalPort"]}'
         _clPort = f'{_bg}{_fbl}'        
@@ -219,10 +219,10 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
 
     if TypeOfTunnel == 'local':        
         _SSHType = '-L'
-        _SSHTypeServer = f"{TunnleDict['Local_or_Rempte_port']}:localhost:{TunnleDict['FinalPort']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['Local_or_Rempte_port']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['FinalPort']}"
     elif TypeOfTunnel == 'remote':
         _SSHType = '-R'
-        _SSHTypeServer = f"{TunnleDict['FinalPort']}:localhost:{TunnleDict['Local_or_Rempte_port']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['Local_or_Rempte_port']}"
     elif TypeOfTunnel == 'dynamic':
         _SSHType = '-R' 
         _SSHTypeServer = f"{TunnleDict['FinalPort']}"        
@@ -232,8 +232,9 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
     if RunAsSudo:
         CommandLst.append('sudo')
     CommandLst.append(_sshCommandMode)
-    CommandLst.append('-M')
-    CommandLst.append(str(MonitorPort))
+    if HighlyRestrictedNetworksEnable:
+        CommandLst.append('-M')
+        CommandLst.append(str(MonitorPort))
     CommandLst.append('-N')
     CommandLst.append(_SSHType)
     CommandLst.append(_SSHTypeServer)
@@ -272,9 +273,9 @@ def FnStartTunnel(TunnleDict):
     retcode = process.poll()
     Pid = process.pid
     WritePIDToFile(Pid, TunnleDict['Name'])
-    print(f"Tunnel PID : {Pid}")
+    print(f"\n\nTunnel PID : {Pid}\n\n")
 
-def CheckStatusTunnel(TunnelName):    
+def CheckStatusTunnel(TunnleDict):    
     return False
     
     
@@ -290,7 +291,7 @@ def CheckAutoSSHCommand():
         return False
     
 def WritePIDToFile(Pid, TunnelName):
-    if os.path.join(current_directory, 'Pids') not in os.listdir(current_directory):
+    if 'Pids' not in os.listdir(current_directory):
         os.makedirs(os.path.join(current_directory, 'Pids'))
     PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
     with open(PidFile, 'w') as f:
