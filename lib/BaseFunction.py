@@ -647,7 +647,15 @@ def FindString(string, substring,CaseSensitivity = False):
       return True
   else:
       return False
-  
+
+def User_is_root():
+  """Checks if the current user is root (superuser) on Unix-like systems.
+
+  Returns:
+    True if the user is root, False otherwise.
+  """
+  return os.geteuid() == 0
+
 if __name__ == "__main__":    
   print(f"{Style.NORMAL + Fore.YELLOW}You should not run this file directly")
   a = {}

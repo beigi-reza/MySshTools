@@ -11,8 +11,7 @@ from core import (
     ServerConfigFile,
     SERVER_LIST,
     SSHKEY,
-    TUNNEL_LIST,
-    RunAsSudo,
+    TUNNEL_LIST,    
     HIGHLY_RESTRICTED_NETWORKS
 )
 
@@ -80,9 +79,6 @@ _bEx_m = "[105m"
 ######################################################
 ######################################################
 
-
-
-    
 
 def MainMenu(Msg = ''):
     while True:        
@@ -186,13 +182,11 @@ def GenerateTunnelLine(Tunnel):
     return f"{_code} {_Title} {_type} {_SourceOrRemote} {_SshServer} {_FinalPort}"
 
 
-def PrintConfig():    
-    RootAccessStr = f'{_fw}\nCreate tunnel with root Privilage : {_bg}{_fbl} {RunAsSudo} {_reset}'
+def PrintConfig():        
     Highly_Restricted_Networks_Str = f'{_fw}Highly Restricted Networks Mode is Enable :{_by}{_fbl} {HighlyRestrictedNetworksEnable} {_reset}'
     ExitOnForwardFailureStr = f'{_fw}Force Exit if port forwarding fails for any reason : {_by}{_fbl} {ExitOnForwardFailure.upper()} {_reset}'
     ServerAliveIntervalStr = f'{_fw}Send keep-alive messages every : {_by}{_fbl}  {ServerAliveInterval}  {_reset}'
-    ServerAliveCountMaxStr = f'{_fw}How many keep-alive messages the client sends before considering the connection dead :  {_by}{_fbl}  {ServerAliveCountMax}  {_reset}'    
-    print (RootAccessStr)
+    ServerAliveCountMaxStr = f'{_fw}How many keep-alive messages the client sends before considering the connection dead :  {_by}{_fbl}  {ServerAliveCountMax}  {_reset}'        
     print (Highly_Restricted_Networks_Str)
     if HighlyRestrictedNetworksEnable:
         AutoSShCommadStatus = CheckAutoSSHCommand()
@@ -209,6 +203,12 @@ To run in `Highly Restricted Networks Mode`, you need the `autossh` program. Fir
             """
             lib.AsciArt.BorderIt(Text=msg1,BorderColor=_fr,TextColor=_fw,WidthBorder=100)
             lib.BaseFunction.FnExit()
+    if lib.BaseFunction.User_is_root() is False:
+        msg1 = """Root Access Required for Use Tunnel."""
+        print('\n\n')
+        lib.AsciArt.BorderIt(Text=msg1,BorderColor=_fr,TextColor=_fy,WidthBorder=100)
+        print('\n\n')
+        lib.BaseFunction.FnExit()
 
             
 def CreateCommamd(TunnleDict,TypeOfTunnel):    
@@ -219,7 +219,7 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
 
     if TypeOfTunnel == 'local':        
         _SSHType = '-L'
-        _SSHTypeServer = f"0.0.0.0:{TunnleDict['Local_or_Rempte_port']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['FinalPort']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['Local_or_Rempte_port']}"
     elif TypeOfTunnel == 'remote':
         _SSHType = '-R'
         _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['Local_or_Rempte_port']}"
@@ -229,8 +229,6 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
     
 
     CommandLst = []    
-    if RunAsSudo:
-        CommandLst.append('sudo')
     CommandLst.append(_sshCommandMode)
     if HighlyRestrictedNetworksEnable:
         CommandLst.append('-M')

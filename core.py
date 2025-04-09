@@ -13,11 +13,13 @@ TAG_VIEW = lib.BaseFunction.GetValue(JsonConfig,"Tag_View",verbus=False,ReturnVa
 SSHKEY = lib.BaseFunction.GetValue(JsonConfig,"SSHKEY",verbus=False,ReturnValueForNone='')
 TUNNEL_LIST = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelDict,Verbus=False,ReternValueForFileNotFound={})
 HIGHLY_RESTRICTED_NETWORKS = lib.BaseFunction.GetValue(TUNNEL_LIST,'Highly_Restricted_Networks',verbus=False,ReturnValueForNone={})
-if TUNNEL_LIST == {}:
-    RunAsSudo = False 
-else:
-    RunAsSudo = TUNNEL_LIST["RunAsSudo"]
-    TUNNEL_LIST = TUNNEL_LIST["tunnel"]
+#if TUNNEL_LIST == {}:
+#    RunAsSudo = False 
+#else:
+#    RunAsSudo = TUNNEL_LIST["RunAsSudo"]
+#    TUNNEL_LIST = TUNNEL_LIST["tunnel"]
+
+TUNNEL_LIST = TUNNEL_LIST["tunnel"]
 
 ######################################################
 ######################################################
