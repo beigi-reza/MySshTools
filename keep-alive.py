@@ -14,7 +14,7 @@ def autostart(TUNNEL_LIST):
 #            future_to_id = executor.submit(tu.FnAutorestartTunnel(tunnel))    
 #            tu.FnStartTunnel(tunnel)
         
-        future_to_id = {executor.submit(tu.FnAutorestartTunnel, tunnel): tunnel for tunnel in TUNNEL_LIST}
+        future_to_id = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in TUNNEL_LIST}
         #future_to_id = {executor.submit(worker_process, i): i for i in range(num_processes)}
 
         for future in concurrent.futures.as_completed(future_to_id):

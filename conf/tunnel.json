@@ -20,14 +20,14 @@
             }        
         },
         {
-            "Name": "My VPS - DE",
-            "Code": "62",
-            "ssh_ip" : "82.115.18.62",
+            "Name": "OTL-MNGR",
+            "Code": "OUT",
+            "ssh_ip" : "194.146.123.231",
             "ssh_user" : "root",
-            "ssh_port" : "2257",            
-            "FinalPort": "17232",
+            "ssh_port" : "3580",            
+            "FinalPort": "8354",
             "Local_or_Rempte_server": "localhost",
-            "Local_or_Rempte_port": "17232",
+            "Local_or_Rempte_port": "8354",
             "Type" : "local",
             "Highly_Restricted_Networks":{
                 "Enable" : false,
@@ -36,24 +36,6 @@
                 "ServerAliveCountMax":3,
                 "MonitorPort": 2001
             }                    
-        },
-        {
-            "Name": "My VPS - IR",
-            "Code": "75",
-            "ssh_ip" : "171.22.26.75",
-            "ssh_user" : "root",
-            "ssh_port" : "8086",            
-            "FinalPort": "80",
-            "Local_or_Rempte_server": "localhost",
-            "Local_or_Rempte_port": "80",
-            "Type" : "dynamic",
-            "Highly_Restricted_Networks":{
-                "Enable" : false,
-                "ExitOnForwardFailure" :"yes",
-                "ServerAliveInterval":60,
-                "ServerAliveCountMax":3,
-                "MonitorPort": 2000
-            }        
         }
     ]
 }

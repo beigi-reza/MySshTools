@@ -6,6 +6,7 @@ import lib.Logo
 import os
 import subprocess
 import signal
+from datetime import datetime, timedelta
 import time
 from core import (
     current_directory,
@@ -307,7 +308,7 @@ def FnStartTunnel(TunnleDict):
     print(f"\n\n\nTunnel {TunnleDict['Name']} started with PID: {Pid}")    
     return Pid
 
-def FnAutorestartTunnel(TunnleDict):
+def FnAutoRestartTunnel(TunnleDict):
     Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())
     while True:
         process = subprocess.Popen(
@@ -315,18 +316,54 @@ def FnAutorestartTunnel(TunnleDict):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             stdin=subprocess.DEVNULL,
-            start_new_session=True
+            start_new_session=False
         )
         Pid = process.pid
         WritePIDToFile(Pid, TunnleDict['Name'])
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")       
+        _LineLog = f"{timestamp},{TunnleDict['Name']},{Pid},Started"        
+        SaveLogWebsite(_LineLog)
         while True:
             retcode = process.poll()
             if retcode is not None:
-                print(f"autossh tunnel disconnected! Restarting... {TunnleDict['Name']}")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")       
+                _LineLog = f"{timestamp},{TunnleDict['Name']},{Pid},Tunnel disconnected! Restarting..."
+                SaveLogWebsite(_LineLog)                
                 break
-            time.sleep(5)
-        print(f"Check ... {TunnleDict['Name']}")
+            time.sleep(5)        
         time.sleep(2)
+
+def SaveLogWebsite(LogLine:str ):        
+    """آماده سازی لاگ برای ذخیره با فرمت CSV
+    به دست آوردن اسم فایل و بررسی وجود
+
+    Args:
+        ResponseDict (DICT): Dict of website status.
+    """
+    RealPath_of_LogFile = os.path.join(current_directory,'logs','KeepAlivelog.csv')    
+    if os.path.isfile(RealPath_of_LogFile) is False:
+        _Titel = "Time,Name,PID,Msg"
+        Saveit(RealPath_of_LogFile,_Titel)        
+    Saveit(RealPath_of_LogFile,LogLine)
+
+def Saveit(FileName,Line):    
+    """ثبت لاگ دپر فایل
+
+    Args:
+        FileName (STR): Realpath of log filwe
+        Line (STR): Log for Save To log
+    """
+    Line = f"{Line}\n"
+    try:
+        f = open(FileName, "a")
+        try:        
+            f.write(Line)            
+        except:
+            print("Something went wrong when writing to the log file [ " + _fr + FileName + _reset + " ]")
+        finally:
+            f.close()
+    except:
+        print("Something went wrong when writing to the log file [ " + _B +  _fr + FileName + _reset + " ]")
 
 
 def CheckStatusTunnel(TunnleDict):    
