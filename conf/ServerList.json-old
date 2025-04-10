@@ -1,0 +1,581 @@
+{
+    "servers": [
+        {
+            "ServerName": "External Monitoring VPS",
+            "IP": "176.9.235.199",
+            "Port": "49150",
+            "User": "root",
+            "Tags": [
+                "Monitoring","VPS"
+            ],
+            "Code": "199",
+            "Group": "VPS",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Backup - Site",
+            "IP": "136.243.83.247",
+            "Port": "3031",
+            "User": "root",
+            "Tags": [
+                "backup","Reserve","56","VPS"
+            ],
+            "Code": "247",
+            "Group": "Backup",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Backup - WordPress",
+            "IP": "10.100.8.14",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Backup","wp","DE"
+            ],
+            "Code": "14",
+            "Group": "Backup",
+            "Icon": ""
+        },
+        {
+            "ServerName": "BigBlueButton",
+            "IP": "10.1.8.177",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "vclass","tms"
+            ],
+            "Code": "bbb",
+            "Group": "TMS",
+            "Icon": ""
+        },
+        {
+            "ServerName": "TMS Server",
+            "IP": "10.1.8.11",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "TMS","IR"
+            ],
+            "Code": "tms",
+            "Group": "TMS",
+            "Icon": "📖"
+        },
+        {
+            "ServerName": "Docker Registry",
+            "IP": "10.1.8.93",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DOCKER_HUB","CI/CD","NUGET","BUGET"
+            ],
+            "Code": "hub",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Attlasian toolchain",
+            "IP": "10.1.8.58",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Jira","Bitbucket","CI/CD"
+            ],
+            "Code": "jira",
+            "Group": "CICD",
+            "Icon": "📊"
+        },
+        {
+            "ServerName": "New Jira Server",
+            "IP": "10.1.8.204",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Jira","CI/CD"
+            ],
+            "Code": "204",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Confluence Server",
+            "IP": "10.1.8.55",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Notice","wiki"
+            ],
+            "Code": "wiki",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Bamboo Server",
+            "IP": "10.1.8.95",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "BamBoo","CI/CD"
+            ],
+            "Code": "bamboo",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Pipeline Agent IR",
+            "IP": "10.1.8.59",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Agent","CI/CD","IR","BamBoo"
+            ],
+            "Code": "agentir",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Pipeline Agent DE",
+            "IP": "10.100.8.7",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Agent","DE","CI/CD","BamBoo"
+            ],
+            "Code": "agent",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Test Agent",
+            "IP": "10.1.8.200",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "test","CI/CD","IR","BamBoo"
+            ],
+            "Code": "200",
+            "Group": "CICD",
+            "Icon": ""
+        },
+        {
+            "ServerName": "STAGE WordPress",
+            "IP": "10.1.8.57",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "CentOS","test"
+            ],
+            "Code": "57",
+            "Group": "Stage",
+            "Icon": ""
+        },
+        {
+            "ServerName": "STAGE Website",
+            "IP": "10.100.8.8",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "stage","ronix","DE"
+            ],
+            "Code": "8.8",
+            "Group": "Stage",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Stage Landing",
+            "IP": "10.1.8.87",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Landing","temp"
+            ],
+            "Code": "8.87",
+            "Group": "Stage",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Development Server",
+            "IP": "10.1.8.180",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DEV"
+            ],
+            "Code": "180",
+            "Group": "DEV",
+            "Icon": "🔵"
+        },
+        {
+            "ServerName": "Stage Server",
+            "IP": "10.1.8.181",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Stage","DEV","RABITMQ"
+            ],
+            "Code": "181",
+            "Group": "DEV",
+            "Icon": "🔵"
+        },
+        {
+            "ServerName": "Dev Database",
+            "IP": "10.1.8.47",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DEV","DB"
+            ],
+            "Code": "8.47",
+            "Group": "DEV",
+            "Icon": "⚠️"
+        },
+        {
+            "ServerName": "Dev Redis",
+            "IP": "10.1.8.48",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DEV","Redis"
+            ],
+            "Code": "8.48",
+            "Group": "DEV",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Primary SITE",
+            "IP": "10.100.52.2",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "site","ronix","DE","api"
+            ],
+            "Code": "52.2",
+            "Group": "Site-Global",
+            "Icon": "⚠️"
+        },
+        {
+            "ServerName": "Site Database",
+            "IP": "10.100.8.4",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DB","ronix","DE"
+            ],
+            "Code": "8.4",
+            "Group": "Site-Global",
+            "Icon": "⚠️"
+        },
+        {
+            "ServerName": "Site Redis",
+            "IP": "10.100.8.3",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "redis","ronix","DE"
+            ],
+            "Code": "8.3",
+            "Group": "Site-Global",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Blog Website (WordPress)",
+            "IP": "10.100.8.5",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Blog","ronix","wp","DE"
+            ],
+            "Code": "8.5",
+            "Group": "Site-Global",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Panel-Admin (Dashboard)",
+            "IP": "10.100.8.6",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "panel","ronix","DE"
+            ],
+            "Code": "adm",
+            "Group": "Site-Global",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Kaltura NGINX Globla Streaming",
+            "IP": "10.100.52.13",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Streaming","ronix","DE"
+            ],
+            "Code": "stream",
+            "Group": "Site-Global",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Mongo DB Germany (SRVGV16)",
+            "IP": "10.100.8.16",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "mongo","ronix","DE","RABITMQ"
+            ],
+            "Code": "8.16",
+            "Group": "Site-Global",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Media Server IR",
+            "IP": "10.1.52.124",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "FileServer","Media","IR","TMS"
+            ],
+            "Code": "124",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Backgroud Serverice",
+            "IP": "10.1.16.126",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "BK","tms"
+            ],
+            "Code": "126",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "DB Center (SRVIV127)",
+            "IP": "10.1.20.127",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DB","IR","TMS"
+            ],
+            "Code": "127",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Local Monitoring",
+            "IP": "10.1.8.7",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Monitoring","IR"
+            ],
+            "Code": "8.7",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Monitoring ELK (SRVIV142)",
+            "IP": "10.1.8.142",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "ELK","AI_TEST"
+            ],
+            "Code": "elk",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Cloud Api - CASP",
+            "IP": "10.1.16.149",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "CASP","TMS"
+            ],
+            "Code": "casp",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Ansible Controller",
+            "IP": "10.1.8.176",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "ansible"
+            ],
+            "Code": "ans",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Mongo DB IRAN (SRVIV201)",
+            "IP": "10.1.20.201",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "mongo","IR","ronix.ir"
+            ],
+            "Code": "201",
+            "Group": "LOCAL",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Web Site Primary Server",
+            "IP": "10.1.52.120",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "ronix.ir","IR","web","api"
+            ],
+            "Code": "52.120",
+            "Group": "Site-IR",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Redis Website IR (SRVIV122)",
+            "IP": "10.1.52.122",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "redis","IR","ronix.ir"
+            ],
+            "Code": "52.122",
+            "Group": "Site-IR",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Database Website IR (SRVIV121)",
+            "IP": "10.1.20.121",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DB","IR","ronix.ir"
+            ],
+            "Code": "20.121",
+            "Group": "Site-IR",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Panel-Admin (Dashboard), (SRVIV123)",
+            "IP": "10.1.8.123",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "panel","ronix.ir"
+            ],
+            "Code": "8.123",
+            "Group": "Site-IR",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Kaltura Nginx - IR, (SRVIV147)",
+            "IP": "10.1.52.147",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Streaming","ronix.ir"
+            ],
+            "Code": "52.147",
+            "Group": "Site-IR",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Panel, DB, Redis (srviv189)",
+            "IP": "10.1.20.189",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "panel","DB","Redis","ronix.shop"
+            ],
+            "Code": "189",
+            "Group": "ronix.shop",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Web, api (srviv190)",
+            "IP": "10.1.52.190",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "ronix.shop","web","api"
+            ],
+            "Code": "190",
+            "Group": "ronix.shop",
+            "Icon": ""
+        },
+        {
+            "ServerName": "RonixDW - (SRVIV192)",
+            "IP": "10.1.20.192",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "BI-DW","BI"
+            ],
+            "Code": "192",
+            "Group": "BI",
+            "Icon": ""
+        },
+        {
+            "ServerName": "RonixML - (SRVIV193)",
+            "IP": "10.1.16.193",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "BI-ML","BI"
+            ],
+            "Code": "193",
+            "Group": "BI",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Website Server (srvgv19)",
+            "IP": "10.100.53.1",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "WEB","vogler","api","streaming"
+            ],
+            "Code": "53.1",
+            "Group": "VoglerTools",
+            "Icon": ""
+        },
+        {
+            "ServerName": "DB, Redis, (srvgv20)",
+            "IP": "10.100.9.1",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "DB","Redis","vogler"
+            ],
+            "Code": "9.1",
+            "Group": "VoglerTools",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Vogler Panel & Stage (srvgv21)",
+            "IP": "10.100.9.2",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Panel","Stage","Mongo","vogler"
+            ],
+            "Code": "9.2",
+            "Group": "VoglerTools",
+            "Icon": ""
+        },
+        {
+            "ServerName": "RonixTest.com (srvgv22)",
+            "IP": "10.100.53.2",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "test","vps"
+            ],
+            "Code": "53.2",
+            "Group": "VPS",
+            "Icon": ""
+        }
+
+    ]
+}

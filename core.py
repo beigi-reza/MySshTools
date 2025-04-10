@@ -7,19 +7,19 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 JsonListFile = os.path.join(current_directory,'conf/config.json')
 JsonConfig = lib.BaseFunction.LoadJsonFile(JsonListFile)
 ServerConfigFile = os.path.join(current_directory,'conf/ServerList.json')
-TunnelDict = os.path.join(current_directory,'conf/tunnel.json')
+#TunnelDict = os.path.join(current_directory,'conf/tunnel.json')
 SERVER_LIST = lib.BaseFunction.LoadJsonFile(ServerConfigFile)["servers"]
 TAG_VIEW = lib.BaseFunction.GetValue(JsonConfig,"Tag_View",verbus=False,ReturnValueForNone=False)
 SSHKEY = lib.BaseFunction.GetValue(JsonConfig,"SSHKEY",verbus=False,ReturnValueForNone='')
-TUNNEL_LIST = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelDict,Verbus=False,ReternValueForFileNotFound={})
-HIGHLY_RESTRICTED_NETWORKS = lib.BaseFunction.GetValue(TUNNEL_LIST,'Highly_Restricted_Networks',verbus=False,ReturnValueForNone={})
+#TUNNEL_LIST = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelDict,Verbus=False,ReternValueForFileNotFound={})
+#HIGHLY_RESTRICTED_NETWORKS = lib.BaseFunction.GetValue(TUNNEL_LIST,'Highly_Restricted_Networks',verbus=False,ReturnValueForNone={})
 #if TUNNEL_LIST == {}:
 #    RunAsSudo = False 
 #else:
 #    RunAsSudo = TUNNEL_LIST["RunAsSudo"]
 #    TUNNEL_LIST = TUNNEL_LIST["tunnel"]
 
-TUNNEL_LIST = TUNNEL_LIST["tunnel"]
+#TUNNEL_LIST = TUNNEL_LIST["tunnel"]
 
 ######################################################
 ######################################################

@@ -15,9 +15,7 @@ import os
 from os import system, name
 from time import sleep
 import shutil
-
-
-
+import socket
 
 
 #######################################################
@@ -655,6 +653,24 @@ def User_is_root():
     True if the user is root, False otherwise.
   """
   return os.geteuid() == 0
+
+def GetLocalIP(Verbus = False):
+    try:
+        # Create a socket connection to an external server
+        # This doesn't actually establish a connection but helps determine which network interface would be used
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Use Google's public DNS server
+        s.connect(("8.8.8.8", 80))
+        # Get the local IP address
+        local_ip = s.getsockname()[0]
+        s.close()
+        return local_ip
+    except Exception as e:
+        if Verbus:
+            print (f"Error determining local IP: {e}")
+        return None
+
+
 
 if __name__ == "__main__":    
   print(f"{Style.NORMAL + Fore.YELLOW}You should not run this file directly")
