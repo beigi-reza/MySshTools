@@ -2,13 +2,13 @@
     "tunnel": [
         {
             "Name": "HFS Download",
-            "Code": "56",
-            "ssh_ip" : "136.243.83.247",
+            "Code": "199",
+            "ssh_ip" : "176.9.235.199",
             "ssh_user" : "root",
-            "ssh_port" : "3031",            
-            "FinalPort": "888",
-            "Local_or_Rempte_server": "localhost",
-            "Local_or_Rempte_port": "80",
+            "ssh_port" : "49150",            
+            "FinalPort": "8100",
+            "Local_or_Rempte_server": "194.146.123.231",
+            "Local_or_Rempte_port": "8354",
             "Type" : "local",
             "Highly_Restricted_Networks":{
                 "Enable" : false,
@@ -20,14 +20,32 @@
             }        
         },
         {
-            "Name": "OTL-MNGR",
-            "Code": "OUT",
-            "ssh_ip" : "194.146.123.231",
+            "Name": "test-Git",
+            "Code": "git",
+            "ssh_ip" : "10.1.87.184",
             "ssh_user" : "root",
-            "ssh_port" : "3580",            
-            "FinalPort": "8354",
+            "ssh_port" : "22",            
+            "FinalPort": "888",
             "Local_or_Rempte_server": "localhost",
-            "Local_or_Rempte_port": "8354",
+            "Local_or_Rempte_port": "8888",
+            "Type" : "local",
+            "Highly_Restricted_Networks":{
+                "Enable" : false,
+                "ExitOnForwardFailure" :"yes",
+                "ServerAliveInterval":60,
+                "ServerAliveCountMax":3,
+                "MonitorPort": 2001
+            }                    
+        },
+        {
+            "Name": "SSH-EN",
+            "Code": "en",
+            "ssh_ip" : "10.1.8.180",
+            "ssh_user" : "root",
+            "ssh_port" : "22",            
+            "FinalPort": "888",
+            "Local_or_Rempte_server": "localhost",
+            "Local_or_Rempte_port": "8888",
             "Type" : "local",
             "Highly_Restricted_Networks":{
                 "Enable" : false,
@@ -37,5 +55,6 @@
                 "MonitorPort": 2001
             }                    
         }
+
     ]
 }

@@ -8,6 +8,7 @@ import subprocess
 import signal
 from datetime import datetime, timedelta
 import time
+import sys
 from core import (
     current_directory,
     JsonListFile,
@@ -90,7 +91,7 @@ def MainMenu(Msg = ''):
     while True:        
         lib.BaseFunction.clearScreen()
         lib.Logo.SshToolsLogo()
-        PrintConfig()
+        RunWithRoot()
         printTunnelList()                
         if Msg != '':
             print("")
@@ -240,16 +241,22 @@ def GenerateTunnelLine(Tunnel):
     return f"{_Mode} {_Title} {_type} {_SourceOrRemote} {_SshServer} {_FinalPort}"
 
 
-def PrintConfig():            
+def RunWithRoot():            
     if lib.BaseFunction.User_is_root() is False:
-        msg1 = """Root Access Required for Use Tunnel."""
+        msg1 = """Tunnel Funcyion requires root privileges, Attempting to restart with sudo..."""
         print('\n\n')
         lib.AsciArt.BorderIt(Text=msg1,BorderColor=_fr,TextColor=_fy,WidthBorder=100)
         print('\n\n')
-        lib.BaseFunction.FnExit()
-
+        #lib.BaseFunction.PressEnterToContinue()
+        try:
+            # Re-run the script with sudo
+            sudo_command = ['sudo', sys.executable] + sys.argv
+            subprocess.run(sudo_command, check=True)
+        except subprocess.CalledProcessError:
+            print("Failed to run with elevated privileges.")
+            lib.BaseFunction.FnExit()
             
-def CreateCommamd(TunnleDict,TypeOfTunnel):    
+def CreateCommamd(TunnleDict,TypeOfTunnel):        
     Highly_Restricted_Networks = TunnleDict["Highly_Restricted_Networks"].get('Enable',False)
     if Highly_Restricted_Networks: 
         _sshCommandMode = 'autossh'        
@@ -271,7 +278,9 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
     
 
     CommandLst = []    
+
     CommandLst.append(_sshCommandMode)
+
     if Highly_Restricted_Networks:
         CommandLst.append('-M')
         CommandLst.append(str(TunnleDict["Highly_Restricted_Networks"].get('MonitorPort',0)))
@@ -305,7 +314,8 @@ def FnStartTunnel(TunnleDict):
     retcode = process.poll()
     Pid = process.pid
     WritePIDToFile(Pid, TunnleDict['Name'])
-    print(f"\n\n\nTunnel {TunnleDict['Name']} started with PID: {Pid}")    
+    print(f"\n\n\nTunnel {TunnleDict['Name']} started with PID: {Pid}")
+    lib.BaseFunction.PressEnterToContinue()
     return Pid
 
 def FnAutoRestartTunnel(TunnleDict):
