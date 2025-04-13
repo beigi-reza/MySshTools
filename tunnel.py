@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-from click import Command
 import lib.AsciArt
 import lib.BaseFunction
 import lib.Logo
@@ -9,6 +8,7 @@ import signal
 from datetime import datetime, timedelta
 import time
 import sys
+import psutil
 from core import (
     current_directory,
     JsonListFile,
@@ -82,10 +82,8 @@ _bEx_c = "[106m"
 _bEx_g = "[102m"
 _bEx_m = "[105m"
 
-
 ######################################################
 ######################################################
-
 
 def MainMenu(Msg = ''):
     while True:        
@@ -120,48 +118,41 @@ def MainMenu(Msg = ''):
         else:
             for _ in TUNNEL_LIST:                
                 findCode = False
+                Msg = ''
                 if _["Code"].lower() == UserInput.lower().strip():
-                    if CheckStatusTunnel(_):
-                        DropTunnel(_)
-                    else:    
-                        FnStartTunnel(_)
-                    findCode = True
-                    break
-                elif _["Name"].lower() == UserInput.lower().strip():
-                    if CheckStatusTunnel(_):
-                        DropTunnel(_)
-                    else:    
-                        FnStartTunnel(_)
-                    findCode = True
-                    break
-            if findCode == False:
-                Msg = f"No server found ( {UserInput} )"
+                    rst = CheckStatusTunnel(_)
+                    if rst[0]:
+                        #DropTunnel(rst[0])
+                        KillProcessByPID(rst[1])
+                    else:
+                        rst = FnStartTunnel(_)
+                        if rst[0] is False:
+                            if rst[1] == '':
+                                Msg = f"Tunnel {UserInput} failed to start."
+                            findCode = False
+                            break
+                        else:    
+                            findCode = True
+                            break
+            if findCode == False:                
+                if Msg == '':
+                    Msg = f"No server found ( {UserInput} )"
 
-def DropAllSShTunnel():
-    for _ in TUNNEL_LIST:
-        IP = _["ssh_ip"]
-        pids = os.popen("ps ax | grep " + IP + " | grep -v grep")
-        try:
-            for line  in pids:
-                fields = line.split()
-                pid = fields[0]                       
-                os.kill(int(pid), signal.SIGKILL)                       
-        except:
-            pass                 
 def StartAllTunnel():
     for _ in TUNNEL_LIST:
-        if CheckStatusTunnel(_):
+        if CheckStatusTunnel(_)[0]:
             print(f"Tunnel {_['Name']} is already running.")
         else:
             FnStartTunnel(_)
-            
-def DropTunnel(TunnleDict):    
-    Pid = GetPIDFromFile(TunnleDict['Name'])    
-    if Pid is not None:
-        if KillProcessByPID(Pid) is False:
-            print(f"Failed to stop proccess {TunnleDict['Name']} ({Pid})")
-            lib.BaseFunction.PressEnterToContinue()
 
+def DropAllSShTunnel():
+    for _ in TUNNEL_LIST:                        
+        _RST = CheckStatusTunnel(_)
+        if _RST[0]:
+            KillProcessByPID(_RST[1])
+
+
+            
 def KillProcessByPID(pid,Verbus=False):
     try:        
         pid = int(pid)        
@@ -217,8 +208,8 @@ def GenerateTunnelLine(Tunnel):
     else:
         _tColor = _fw
         _FinalIP = ' - '
-        
-    if CheckStatusTunnel(Tunnel):
+    _rst = CheckStatusTunnel(Tunnel)
+    if _rst[0]:
         _Icon = '▶️'        
         _FinalPort = f'{_Icon}  {_FinalIP}:{Tunnel["FinalPort"]}'
         _clPort = f'{_bg}{_fbl}'        
@@ -302,45 +293,64 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
 
 
 def FnStartTunnel(TunnleDict):
-    Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())
-    print(Command)
-    process = subprocess.Popen(
-        Command,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        stdin=subprocess.DEVNULL,
-        start_new_session=True               
-        )
-    retcode = process.poll()
-    Pid = process.pid
-    WritePIDToFile(Pid, TunnleDict['Name'])
-    print(f"\n\n\nTunnel {TunnleDict['Name']} started with PID: {Pid}")
-    lib.BaseFunction.PressEnterToContinue()
-    return Pid
-
-def FnAutoRestartTunnel(TunnleDict):
-    Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())
-    while True:
+    Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())    
+    try:
         process = subprocess.Popen(
             Command,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,        
             stdin=subprocess.DEVNULL,
-            start_new_session=False
-        )
-        Pid = process.pid
-        WritePIDToFile(Pid, TunnleDict['Name'])
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")       
-        _LineLog = f"{timestamp},{TunnleDict['Name']},{Pid},Started"        
+            start_new_session=True,            
+            )            
+        #time.sleep(1)        
+        _rst = CheckStatusTunnel(TunnleDict)
+        if _rst[0]:
+            return True,''
+        else:
+            return False,''
+    except Exception as e:
+        msg = (f"🔥 Exception occurred while starting autossh: {e}")        
+        return  False,msg
+    
+def FnAutoRestartTunnel(TunnleDict):
+    Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())
+    while True:        
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        _LineLog = f"{timestamp},{TunnleDict['Name']},None,Trying to Start Tunnel"
+        print (f"{_LineLog}")
         SaveLogWebsite(_LineLog)
+        process = subprocess.Popen(
+            Command,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,        
+            stdin=subprocess.DEVNULL,
+            start_new_session=False,
+            )            
+        time.sleep(1)
+        _rst = CheckStatusTunnel(TunnleDict)
+        Pid = process.pid
+        if _rst[0] is False:            
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            _LineLog = f"{timestamp},{TunnleDict['Name']},{Pid},Error: Unable to start tunnel"
+            SaveLogWebsite(_LineLog)
+            print (f"{_LineLog}")
+            time.sleep(5)
+            continue                   
+        else:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            _LineLog = f"{timestamp},{TunnleDict['Name']},None,Started Tunnel"
+            SaveLogWebsite(_LineLog)
+            print (f"{_LineLog}")
         while True:
             retcode = process.poll()
             if retcode is not None:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")       
                 _LineLog = f"{timestamp},{TunnleDict['Name']},{Pid},Tunnel disconnected! Restarting..."
-                SaveLogWebsite(_LineLog)                
+                SaveLogWebsite(_LineLog)
+                print (f"{_LineLog}")        
                 break
-            time.sleep(5)        
+            time.sleep(5)
+        print("waitt for 2 sec")    
         time.sleep(2)
 
 def SaveLogWebsite(LogLine:str ):        
@@ -376,16 +386,60 @@ def Saveit(FileName,Line):
         print("Something went wrong when writing to the log file [ " + _B +  _fr + FileName + _reset + " ]")
 
 
-def CheckStatusTunnel(TunnleDict):    
-    Pid = GetPIDFromFile(TunnleDict['Name'])    
-    if Pid is not None:
-        pidDetail = os.popen("ps ax | grep " + str(Pid) + " | grep -v grep")
-        if pidDetail.read() == "":
-            return False
-        else:
-            return True
+#def CheckStatusTunnel(_Tunnle):        
+#    _Highly_Restricted_Networks = _Tunnle["Highly_Restricted_Networks"].get('Enable',False)
+#    ProcessDict = GetProcessList(_Tunnle)
+#    if _Tunnle['Type'] == 'local':        
+#        _SSHType = '-L'
+#        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+#    elif _Tunnle['Type'] == 'remote':
+#        _SSHType = '-R'
+#        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+#    elif _Tunnle['Type'] == 'dynamic':
+#        _SSHType = '-R' 
+#        _SSHTypeServer = f"{_Tunnle['FinalPort']}"        
+#
+#    UserIP = f'{_Tunnle["ssh_user"]}@{_Tunnle["ssh_ip"]}'
+#    for _process in ProcessDict:
+#        if UserIP in ProcessDict[_process]:
+#            if _SSHType in ProcessDict[_process]:
+#                if _SSHTypeServer in ProcessDict[_process]:
+#                    return True, _process
+#             
+#    return False,''
+
+def CheckStatusTunnel(_Tunnle):
+    Highly_Restricted_Networks_mode = _Tunnle["Highly_Restricted_Networks"].get('Enable',False)
+    if _Tunnle['Type'] == 'local':        
+        _SSHType = '-L'
+        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+    elif _Tunnle['Type'] == 'remote':
+        _SSHType = '-R'
+        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+    elif _Tunnle['Type'] == 'dynamic':
+        _SSHType = '-R' 
+        _SSHTypeServer = f"{_Tunnle['FinalPort']}"        
+    
+    if Highly_Restricted_Networks_mode:
+        CommandStr = 'autossh'
     else:
-        return False    
+        CommandStr = 'ssh'
+
+    UserIP = f'{_Tunnle["ssh_user"]}@{_Tunnle["ssh_ip"]}'            
+    try:
+        # Check if the process exists
+        for proc in psutil.process_iter(['cmdline', 'pid', 'name']):
+            if proc.name().lower().strip() == CommandStr.lower().strip():
+                if UserIP in proc.cmdline():
+                    if _SSHType in proc.cmdline():
+                        if _SSHTypeServer in proc.cmdline():
+                            return True, proc.pid                                    
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        return False,''
+    return False,''
+    
+
+
 
 def CheckAutoSSHCommand():
     """Executes a command and returns its output."""
@@ -398,20 +452,96 @@ def CheckAutoSSHCommand():
     except FileNotFoundError:        
         return False
     
-def WritePIDToFile(Pid, TunnelName):
-    if 'Pids' not in os.listdir(current_directory):
-        os.makedirs(os.path.join(current_directory, 'Pids'))
-    PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
-    with open(PidFile, 'w') as f:
-        f.write(str(Pid))
+#def WritePIDToFile(Pid, TunnelName):
+#    if 'Pids' not in os.listdir(current_directory):
+#        os.makedirs(os.path.join(current_directory, 'Pids'))
+#    PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
+#    with open(PidFile, 'w') as f:
+#        f.write(str(Pid))
+#
+#def GetPIDFromFile(TunnelName):
+#    PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
+#    if os.path.exists(PidFile):
+#        with open(PidFile, 'r') as f:
+#            return int(f.read().strip())
+#    else:
+#        return None
 
-def GetPIDFromFile(TunnelName):
-    PidFile = os.path.join(current_directory, 'Pids', f'{TunnelName}.pid')
-    if os.path.exists(PidFile):
-        with open(PidFile, 'r') as f:
-            return int(f.read().strip())
-    else:
-        return None
+
+def GetProcessDetails(pid):
+    """Get detailed information about a process if it exists."""
+    details = {}
+    try:
+        # Check if the process exists
+        process = psutil.Process(pid)
+        
+        # Basic process information
+        #print(f"\nPID {pid} found. Process details:")
+        #print("=" * 50)
+        
+        # Process basic info
+        try:
+            parent = process.parent()
+            parentDetails = f"PID {parent.pid} ({parent.name()})"            
+        except (psutil.NoSuchProcess, AttributeError):
+            parentDetails = 'Not available'
+
+        children = process.children()
+        if children:
+            for child in children[:5]:  # Limit to first 5 children
+                childrenDetail = f"  PID {child.pid} ({child.name()})"                
+            if len(children) > 5:                
+                childrenDetail = f"  ... and {len(children) - 5} more"
+        else:
+            childrenDetail = 'None'
+        memory_info = process.memory_info()
+        create_time = datetime.fromtimestamp(process.create_time()).strftime('%Y-%m-%d %H:%M:%S')
+        CMDStr = ' '.join(process.cmdline())
+        connectionsList = []
+        try:            
+            connections = process.net_connections()
+            if connections:                                
+                for conn in connections[:5]:  # Limit to first 5 connections
+                    local = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
+                    remote = f"{conn.raddr.ip}:{conn.raddr.port}" if conn.raddr else "N/A"                                                                                
+                    connectionsList.append(f"  {conn.type} - Local: {local} Remote: {remote} ({conn.status})")
+                if len(connections) > 5:
+                    connectionsList.append(f"  ... and {len(connections) - 5} more connections")
+                    #print(f"  ... and {len(connections) - 5} more connections")
+            else:
+                connectionsList.append("  None")                
+        except (psutil.AccessDenied, psutil.ZombieProcess):            
+            connectionsList.append("  Access denied or zombie process")
+
+
+        details = { 
+            'name': process.name(),
+            'exe': process.exe(),
+            'cmdline': CMDStr,
+            'status': process.status(),
+            'user': process.username(),
+            'memory':{
+                'memory_info_RSS': f'{memory_info.rss / (1024 * 1024):.2f} MB',
+                'memory_info_VMS': f'{memory_info.vms / (1024 * 1024):.2f} MB'
+            },
+            'start_time': create_time,
+            'cpu_percent': f'{process.cpu_percent(interval=0.1):.1f}%',
+            'parent': parentDetails,
+            'children': childrenDetail,
+            'network': connectionsList
+        }
+    
+        return True, details
+        
+    except psutil.NoSuchProcess:
+        msg = f"PID {pid} not found."
+        return False , msg
+    except psutil.AccessDenied:
+        msg = f"PID {pid} found, but access was denied to get process details."
+        return True, msg
+    except Exception as e:
+        msg = f"An error occurred: {e}"
+        return False, msg
 
 
 signal.signal(signal.SIGINT, lib.BaseFunction.handler)

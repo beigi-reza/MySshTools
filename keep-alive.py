@@ -3,6 +3,7 @@
 import lib.BaseFunction
 import tunnel as tu
 import concurrent.futures
+from datetime import datetime, timedelta
 from tunnel import ( 
     TUNNEL_LIST
 )
@@ -28,4 +29,8 @@ def autostart(TUNNEL_LIST):
 
 
 if __name__ == "__main__":
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    _LineLog = f"### {timestamp},Trying Started Tunnel as Keep Alive Mode ..."
+    print (f"{_LineLog}")
+    tu.SaveLogWebsite(_LineLog)
     autostart(TUNNEL_LIST)
