@@ -128,7 +128,13 @@ def ScpProgress(SourceLst,destinationLst,SourcePath,DestPath,mode):
     print(f'{_BColor}{LineDown}{_reset}')
 
 
-if __name__ == "__main__":    
+def sshTunnel(Mode=1):
+    if Mode == 1:
+        print(f'{_D}{_fc} _____ _____ _____    _____                 _ {_reset}')
+        print(f'{_D}{_fc}|   __|   __|  |  |  |_   _|_ _ ___ ___ ___| |{_reset}')
+        print(f'{_N}{_fc}|__   |__   |     |    | | | | |   |   | -_| |{_reset}')
+        print(f'{_B}{_fc}|_____|_____|__|__|    |_| |___|_|_|_|_|___|_|{_reset}')
+if __name__ == "__main__":        
     print(f"{_B}{_fy}You should not run this file directly")
 
 

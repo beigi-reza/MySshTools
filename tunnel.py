@@ -88,7 +88,7 @@ _bEx_m = "[105m"
 def MainMenu(Msg = ''):
     while True:        
         lib.BaseFunction.clearScreen()
-        lib.Logo.SshToolsLogo()
+        lib.Logo.sshTunnel()
         RunWithRoot()
         printTunnelList()                
         if Msg != '':
@@ -99,10 +99,8 @@ def MainMenu(Msg = ''):
         print(f'\n\n{_fw}( {_fg}s{_fw} ) Start all Tunnel{_reset}')
         print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
         print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')
-        print(f'{_fw}( {_fy}c {_fw}) Chek Tunnel{_reset}')
-        print(f'{_fw}( {_fy}t {_fw}) Test Connection{_reset}')
         print(f'\n{_D}q for quit{_reset}')
-        UserInput = input(f'{_B}{_fw}Or Enter tunnel name :  {_reset}')        
+        UserInput = input(f'{_B}{_fw}Or Enter tunnel Code :  {_reset}')        
         if UserInput.strip().lower() in ['q','s','d','r','']:
             if UserInput == 'q':
                 lib.BaseFunction.FnExit()
@@ -120,25 +118,111 @@ def MainMenu(Msg = ''):
                 findCode = False
                 Msg = ''
                 if _["Code"].lower() == UserInput.lower().strip():
-                    rst = CheckStatusTunnel(_)
-                    if rst[0]:
-                        #DropTunnel(rst[0])
-                        KillProcessByPID(rst[1])
-                        findCode = True
-                    else:
-                        rst = FnStartTunnel(_)
-                        if rst[0] is False:
-                            if rst[1] == '':
-                                Msg = f"Tunnel {UserInput} failed to start."
-                            findCode = False
-                            break
-                        else:    
-                            findCode = True
-                            break
+                    ViewTunnleStatus(_)
+                    findCode = True
+
+
+                #if _["Code"].lower() == UserInput.lower().strip():
+                #    rst = CheckStatusTunnel(_)
+                #    if rst[0]:
+                #        #DropTunnel(rst[0])
+                #        KillProcessByPID(rst[1])
+                #        findCode = True
+                #    else:
+                #        rst = FnStartTunnel(_)
+                #        if rst[0] is False:
+                #            if rst[1] == '':
+                #                Msg = f"Tunnel {UserInput} failed to start."
+                #            findCode = False
+                #            break
+                #        else:    
+                #            findCode = True
+                #            break
             if findCode == False:                
                 if Msg == '':
                     Msg = f"No server found ( {UserInput} )"
 
+
+def ViewTunnleStatus(TunnelDict):
+    while True:
+        rst = CheckStatusTunnel(TunnelDict)
+        lib.BaseFunction.clearScreen()
+        lib.Logo.sshTunnel()    
+        if rst[0]:
+            print(f'\nTunnel is : {_fw}{_bg} READY {_reset}')
+            print(f"\nTunnel {_fb}{TunnelDict['Name']}{_fw} is running with PID : {_by}{_fbl} {rst[1]} {_reset}")            
+            details = GetProcessDetails(rst[1])
+        else:
+            print(f'\nTunnel is : {_fw}{_bb} STOP {_reset}')
+            print(f"\nTunnel {_fw}{TunnelDict['Name']}{_fw} is not running.{_reset}")            
+        if {TunnelDict['Type'] == 'local'}:
+            LocalOrRemoteServerlable = "Local Server"
+        else:
+            LocalOrRemoteServerlable = "Remote Server"    
+
+        if TunnelDict["Highly_Restricted_Networks"].get('Enable',False):
+            _mode = f'{_by}{_fbl} ENABLED '
+        else:
+            _mode = f'{_bbl} DISABLED '        
+        ModeStr = f'\nHighly restricted network mode : {_mode}{_reset}'
+            
+        print(f"{ModeStr}")
+        print(f"\nTunnel name : {_fc}{TunnelDict['Name']}{_reset}")
+        print(f"Tunnel code : {_fc}{TunnelDict['Code']}{_reset}")
+        print(f"IP : {_fc}{TunnelDict['ssh_ip']}{_reset}")
+        print(f"User : {_fc}{TunnelDict['ssh_user']}{_reset}")
+        print(f"Port : {_fc}{TunnelDict['ssh_port']}{_reset}")
+        print(f"Final Port on {LocalOrRemoteServerlable} : {_B}{_fc}{TunnelDict['FinalPort']}{_reset}")
+        print (f"Advanced Options :")
+        print (f"  - Monitor Port : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('MonitorPort',0)}{_reset} Use Only for Highly Restricted Network Mode")
+        print (f"  - ServerAliveInterval : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveInterval',0)}{_reset}")
+        print (f"  - ServerAliveCountMax : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveCountMax',0)}{_reset}")
+        print (f"  - ExitOnForwardFailure : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ExitOnForwardFailure','no')}{_reset}")        
+        if rst[0]:
+            if details[0]:
+                print (f'\n{"-"*30} Process Details {"-"*30}')
+                print(f"Process Name : {_fy}{details[1]['name']}{_reset}")                
+                print(f"Execute Path : {_fy}{details[1]['exe']}{_reset}")
+                print(f"Command Line : {_fy}{details[1]['cmdline']}{_reset}")
+                print(f"Status : {_fy}{details[1]['status']}{_reset}")
+                print(f"User : {_fy}{details[1]['user']}{_reset}")
+                print(f"Memory Info : ")
+                print(f"  - RSS : {_fy}{details[1]['memory']['memory_info_RSS']}{_reset}")
+                print(f"  - VMS : {_fy}{details[1]['memory']['memory_info_VMS']}{_reset}")
+                print(f"Start Time : {_fy}{details[1]['start_time']}{_reset}")
+                print(f"CPU Info : ")
+                print(f"  - CPU Percent : {_fy}{details[1]['cpu_percent']}{_reset}")
+                print(f"  - Parent Process : {_fy}{details[1]['parent']}{_reset}")
+                print(f"  - Children Process : {_fy}{details[1]['children']}{_reset}")
+                print(f"Network Connections : ")                
+                for _conn in details[1]['network']:
+                    print(f"  - {_fy}{_conn}{_reset}")
+                print (f'\n{"-"*30} Process Details {"-"*30}')                
+            else:                                
+                print(f'{_fr}Error getting process details.{_reset}')    
+                print(details[1])        
+
+        if rst[0]:
+            print(f'\n{_fw}( {_fr}s {_fw}) for Stop Tunnel {_reset}')
+        else    :
+            print(f'\n{_fw}( {_fg}s{_fw} ) for Start Tunnel{_reset}')    
+        print(f'{_fw}( {_fc}Enter {_fw}) for Check Status {_reset}')
+        print(f'{_fw}( {_fc}0 {_fw}) Back to Start Menu {_reset}')
+        print(f'\n{_D}q for quit{_reset}')
+        UserInput = input(f'{_B}{_fw}Enter Command :  {_reset}')        
+        if UserInput.strip().lower() in ['0','s','q']:
+            if UserInput == '0':
+                if rst[0]:
+                    return True
+                else:
+                    return False
+            elif UserInput == 'q':
+                lib.BaseFunction.FnExit()
+            elif UserInput == 's':
+                if rst[0] is False:
+                    FnStartTunnel(TunnelDict)
+                else:
+                    KillProcessByPID(rst[1])
 def StartAllTunnel():
     for _ in TUNNEL_LIST:
         if CheckStatusTunnel(_)[0]:
@@ -191,8 +275,8 @@ def printTunnelList():
 
 
 def GenerateTunnelLine(Tunnel):
-    _LServer = lib.BaseFunction.GetValue(Tunnel, "Local_or_Rempte_server")
-    _LPort = lib.BaseFunction.GetValue(Tunnel, "Local_or_Rempte_port")
+    _LServer = lib.BaseFunction.GetValue(Tunnel, "Source_port")
+    _LPort = lib.BaseFunction.GetValue(Tunnel, "Source_port")
     _sshPort = lib.BaseFunction.GetValue(Tunnel, "ssh_port")
     _sshIp = lib.BaseFunction.GetValue(Tunnel, "ssh_ip")
     _sshUser = lib.BaseFunction.GetValue(Tunnel, "ssh_user")
@@ -257,10 +341,10 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
 
     if TypeOfTunnel == 'local':        
         _SSHType = '-L'
-        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['Local_or_Rempte_port']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Source_port']}:{TunnleDict['Source_port']}"
     elif TypeOfTunnel == 'remote':
         _SSHType = '-R'
-        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Local_or_Rempte_server']}:{TunnleDict['Local_or_Rempte_port']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Source_port']}:{TunnleDict['Source_port']}"
     elif TypeOfTunnel == 'dynamic':
         _SSHType = '-R' 
         _SSHTypeServer = f"{TunnleDict['FinalPort']}"        
@@ -392,10 +476,10 @@ def Saveit(FileName,Line):
 #    ProcessDict = GetProcessList(_Tunnle)
 #    if _Tunnle['Type'] == 'local':        
 #        _SSHType = '-L'
-#        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+#        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_port']}:{_Tunnle['Source_port']}"
 #    elif _Tunnle['Type'] == 'remote':
 #        _SSHType = '-R'
-#        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+#        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_port']}:{_Tunnle['Source_port']}"
 #    elif _Tunnle['Type'] == 'dynamic':
 #        _SSHType = '-R' 
 #        _SSHTypeServer = f"{_Tunnle['FinalPort']}"        
@@ -413,10 +497,10 @@ def CheckStatusTunnel(_Tunnle):
     Highly_Restricted_Networks_mode = _Tunnle["Highly_Restricted_Networks"].get('Enable',False)
     if _Tunnle['Type'] == 'local':        
         _SSHType = '-L'
-        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_port']}:{_Tunnle['Source_port']}"
     elif _Tunnle['Type'] == 'remote':
         _SSHType = '-R'
-        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Local_or_Rempte_server']}:{_Tunnle['Local_or_Rempte_port']}"
+        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_port']}:{_Tunnle['Source_port']}"
     elif _Tunnle['Type'] == 'dynamic':
         _SSHType = '-R' 
         _SSHTypeServer = f"{_Tunnle['FinalPort']}"        
@@ -543,6 +627,7 @@ def GetProcessDetails(pid):
     except Exception as e:
         msg = f"An error occurred: {e}"
         return False, msg
+    
 
 
 signal.signal(signal.SIGINT, lib.BaseFunction.handler)
@@ -552,4 +637,5 @@ signal.signal(signal.SIGINT, lib.BaseFunction.handler)
 
 
 if __name__ == "__main__":
+
     MainMenu()
