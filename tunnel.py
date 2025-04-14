@@ -96,9 +96,10 @@ def MainMenu(Msg = ''):
             print("")
             lib.AsciArt.BorderIt(Text=Msg,BorderColor=_fy,TextColor=_fEx_r)
             Msg = ''
-        print(f'\n\n{_fw}( {_fg}s{_fw} ) Start all Tunnel{_reset}')
+        print(f'\n\n{_fw}( {_fg}s{_fw}) Start all Tunnel{_reset}')
         print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
         print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')
+        print(f'{_fw}( . ) Enter tunnel code for more ...{_reset}')
         print(f'\n{_D}q for quit{_reset}')
         UserInput = input(f'{_B}{_fw}Or Enter tunnel Code :  {_reset}')        
         if UserInput.strip().lower() in ['q','s','d','r','']:
@@ -178,6 +179,7 @@ def ViewTunnleStatus(TunnelDict):
         print (f"  - ServerAliveInterval : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveInterval',0)}{_reset}")
         print (f"  - ServerAliveCountMax : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveCountMax',0)}{_reset}")
         print (f"  - ExitOnForwardFailure : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ExitOnForwardFailure','no')}{_reset}")        
+
         if rst[0]:
             if details[0]:
                 print (f'\n{"-"*30} Process Details {"-"*30}')
@@ -201,16 +203,17 @@ def ViewTunnleStatus(TunnelDict):
             else:                                
                 print(f'{_fr}Error getting process details.{_reset}')    
                 print(details[1])        
-
+        else:
+            print (f'\n{"-"*50}')
         if rst[0]:
-            print(f'\n{_fw}( {_fr}s {_fw}) for Stop Tunnel {_reset}')
+            print(f'\n{_fw}( {_fr}d {_fw}) for Stop Tunnel.{_reset}')
         else    :
-            print(f'\n{_fw}( {_fg}s{_fw} ) for Start Tunnel{_reset}')    
-        print(f'{_fw}( {_fc}Enter {_fw}) for Check Status {_reset}')
-        print(f'{_fw}( {_fc}0 {_fw}) Back to Start Menu {_reset}')
+            print(f'\n{_fw}( {_fy}s{_fw} ) for Start Tunnel.{_reset}')    
+        print(f'{_fw}( {_fw}Enter {_fw}) for Check Status.{_reset}')
+        print(f'{_fw}( {_fc}0 {_fw}) Back to Start Menu.{_reset}')
         print(f'\n{_D}q for quit{_reset}')
         UserInput = input(f'{_B}{_fw}Enter Command :  {_reset}')        
-        if UserInput.strip().lower() in ['0','s','q']:
+        if UserInput.strip().lower() in ['0','s','q','d']:
             if UserInput == '0':
                 if rst[0]:
                     return True
@@ -221,8 +224,10 @@ def ViewTunnleStatus(TunnelDict):
             elif UserInput == 's':
                 if rst[0] is False:
                     FnStartTunnel(TunnelDict)
-                else:
+            elif UserInput == 'd':                    
+                if rst[0]:
                     KillProcessByPID(rst[1])
+
 def StartAllTunnel():
     for _ in TUNNEL_LIST:
         if CheckStatusTunnel(_)[0]:
