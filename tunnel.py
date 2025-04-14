@@ -124,6 +124,7 @@ def MainMenu(Msg = ''):
                     if rst[0]:
                         #DropTunnel(rst[0])
                         KillProcessByPID(rst[1])
+                        findCode = True
                     else:
                         rst = FnStartTunnel(_)
                         if rst[0] is False:
@@ -302,7 +303,7 @@ def FnStartTunnel(TunnleDict):
             stdin=subprocess.DEVNULL,
             start_new_session=True,            
             )            
-        #time.sleep(1)        
+        time.sleep(1)        
         _rst = CheckStatusTunnel(TunnleDict)
         if _rst[0]:
             return True,''
@@ -429,17 +430,17 @@ def CheckStatusTunnel(_Tunnle):
     try:
         # Check if the process exists
         for proc in psutil.process_iter(['cmdline', 'pid', 'name']):
-            if proc.name().lower().strip() == CommandStr.lower().strip():
-                if UserIP in proc.cmdline():
-                    if _SSHType in proc.cmdline():
-                        if _SSHTypeServer in proc.cmdline():
-                            return True, proc.pid                                    
+            if proc.name().lower().strip() == CommandStr.lower().strip():                                
+                CmdLine = proc.info['cmdline']
+                if CmdLine is not None:
+                    if UserIP in CmdLine:
+                        if _SSHType in CmdLine:
+                            if _SSHTypeServer in CmdLine:
+                                return True, proc.pid                                    
     except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-        return False,''
+        return False,'error'
     return False,''
     
-
-
 
 def CheckAutoSSHCommand():
     """Executes a command and returns its output."""

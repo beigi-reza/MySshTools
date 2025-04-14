@@ -65,6 +65,14 @@ _bEx_c = "[106m"
 _bEx_g = "[102m"
 _bEx_m = "[105m"
 
+if os.path.exists(SSHKEY) == False:
+    lib.BaseFunction.clearScreen()
+    lib.Logo.SshToolsLogo()
+    lib.AsciArt.BorderIt(Text=f'canot find the SSH key File ({SSHKEY})',BorderColor=_fr,TextColor=_fw)
+    lib.BaseFunction.FnExit(1)
+
+
+
 def FindServers(SerachKey):
     """Search for servers based on the entered key
     Args:
@@ -187,6 +195,7 @@ def printServerInfo(ServerCode):
                 TagsStr += f"{_fw}{_bb} {_t} {_reset} "
             print(f"{_fw}Tags        : {TagsStr}{_reset}")
             return _
+
 
 
 def CreategroupList(GroupBy='Group'):
