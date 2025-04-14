@@ -280,7 +280,7 @@ def printTunnelList():
 
 
 def GenerateTunnelLine(Tunnel):
-    _LServer = lib.BaseFunction.GetValue(Tunnel, "Source_port")
+    _LServer = lib.BaseFunction.GetValue(Tunnel, "Source_Server")
     _LPort = lib.BaseFunction.GetValue(Tunnel, "Source_port")
     _sshPort = lib.BaseFunction.GetValue(Tunnel, "ssh_port")
     _sshIp = lib.BaseFunction.GetValue(Tunnel, "ssh_ip")
@@ -346,10 +346,10 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
 
     if TypeOfTunnel == 'local':        
         _SSHType = '-L'
-        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Source_port']}:{TunnleDict['Source_port']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Source_Server']}:{TunnleDict['Source_port']}"
     elif TypeOfTunnel == 'remote':
         _SSHType = '-R'
-        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Source_port']}:{TunnleDict['Source_port']}"
+        _SSHTypeServer = f"0.0.0.0:{TunnleDict['FinalPort']}:{TunnleDict['Source_Server']}:{TunnleDict['Source_port']}"
     elif TypeOfTunnel == 'dynamic':
         _SSHType = '-R' 
         _SSHTypeServer = f"{TunnleDict['FinalPort']}"        
@@ -502,10 +502,10 @@ def CheckStatusTunnel(_Tunnle):
     Highly_Restricted_Networks_mode = _Tunnle["Highly_Restricted_Networks"].get('Enable',False)
     if _Tunnle['Type'] == 'local':        
         _SSHType = '-L'
-        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_port']}:{_Tunnle['Source_port']}"
+        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_Server']}:{_Tunnle['Source_port']}"
     elif _Tunnle['Type'] == 'remote':
         _SSHType = '-R'
-        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_port']}:{_Tunnle['Source_port']}"
+        _SSHTypeServer = f"0.0.0.0:{_Tunnle['FinalPort']}:{_Tunnle['Source_Server']}:{_Tunnle['Source_port']}"
     elif _Tunnle['Type'] == 'dynamic':
         _SSHType = '-R' 
         _SSHTypeServer = f"{_Tunnle['FinalPort']}"        
