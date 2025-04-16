@@ -4,33 +4,62 @@ import lib.BaseFunction
 import tunnel as tu
 import concurrent.futures
 from datetime import datetime, timedelta
+import os
 from tunnel import ( 
-    TUNNEL_LIST
+    TUNNEL_LIST 
+)
+from core import (
+    current_directory
 )
 
 
-def autostart(TUNNEL_LIST):
-    with concurrent.futures.ProcessPoolExecutor() as executor:    
-#        for tunnel in TUNNEL_LIST:
-#            future_to_id = executor.submit(tu.FnAutorestartTunnel(tunnel))    
-#            tu.FnStartTunnel(tunnel)
-        
-        future_to_id = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in TUNNEL_LIST}
-        #future_to_id = {executor.submit(worker_process, i): i for i in range(num_processes)}
+#def autostart(TUNNEL_LIST):
+#    with concurrent.futures.ProcessPoolExecutor() as executor:    
+##        for tunnel in TUNNEL_LIST:
+##            future_to_id = executor.submit(tu.FnAutorestartTunnel(tunnel))    
+##            tu.FnStartTunnel(tunnel)
+#        
+#        future_to_id = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in TUNNEL_LIST}
+#        #future_to_id = {executor.submit(worker_process, i): i for i in range(num_processes)}
+#
+#        for future in concurrent.futures.as_completed(future_to_id):
+#            process_id = future_to_id[future]
+#            try:
+#                result = future.result()
+#                print(f"Received: {result}")
+#            except Exception as e:
+#                print(f"Process {process_id} generated an exception: {e}")
 
-        for future in concurrent.futures.as_completed(future_to_id):
-            process_id = future_to_id[future]
-            try:
-                result = future.result()
-                print(f"Received: {result}")
-            except Exception as e:
-                print(f"Process {process_id} generated an exception: {e}")
 
 
 
-if __name__ == "__main__":
+def FnStartTthread():
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(TUNNEL_LIST)) as executor:    
+        future_to_tunnel = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in TUNNEL_LIST}
+        try:
+            for future in concurrent.futures.as_completed(future_to_tunnel):
+                tunnel = future_to_tunnel[future]
+                try:
+                    result = future.result()
+                    print(f"Tunnel thread for {tunnel.name} completed with: {result}")
+                except Exception as e:
+                    print(f"Tunnel {tunnel.name} generated an exception: {str(e)}")
+        except KeyboardInterrupt:
+            print("Shutting down all tunnels...")
+
+
+
+
+if __name__ == "__main__":    
+    logpath  = os.path.join(current_directory,'logs')
+    if os.path.exists(logpath) == False:
+        _log = f'Logs Folder not found [ {logpath} ]'
+        print (f"{_log}")        
+        lib.BaseFunction.FnExit()
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     _LineLog = f"### {timestamp},Trying Started Tunnel as Keep Alive Mode ..."
     print (f"{_LineLog}")
     tu.SaveLogWebsite(_LineLog)
-    autostart(TUNNEL_LIST)
+    #autostart(TUNNEL_LIST)
+    FnStartTthread()

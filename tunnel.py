@@ -96,7 +96,7 @@ def MainMenu(Msg = ''):
             print("")
             lib.AsciArt.BorderIt(Text=Msg,BorderColor=_fy,TextColor=_fEx_r)
             Msg = ''
-        print(f'\n\n{_fw}( {_fg}s{_fw}) Start all Tunnel{_reset}')
+        print(f'\n\n{_fw}( {_fg}s {_fw}) Start all Tunnel{_reset}')
         print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
         print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')
         print(f'{_fw}( . ) Enter tunnel code for more ...{_reset}')
@@ -589,7 +589,8 @@ def GetProcessDetails(pid):
         CMDStr = ' '.join(process.cmdline())
         connectionsList = []
         try:            
-            connections = process.net_connections()
+            #connections = process.net_connections()
+            connections = process.connections()
             if connections:                                
                 for conn in connections[:5]:  # Limit to first 5 connections
                     local = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
