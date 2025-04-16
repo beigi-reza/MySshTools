@@ -31,11 +31,15 @@ from core import (
 #                print(f"Process {process_id} generated an exception: {e}")
 
 
-
-
-def FnStartTthread():
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(TUNNEL_LIST)) as executor:    
-        future_to_tunnel = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in TUNNEL_LIST}
+def KeepAliveList():
+    _tunnel = []
+    for tunnel in TUNNEL_LIST:
+        if tunnel.get('Keep_Alive',False):
+            _tunnel.append(tunnel)
+    return _tunnel
+def FnStartTthread(KeepAliveTunnelList):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(KeepAliveTunnelList)) as executor:    
+        future_to_tunnel = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in KeepAliveTunnelList}
         try:
             for future in concurrent.futures.as_completed(future_to_tunnel):
                 tunnel = future_to_tunnel[future]
@@ -46,8 +50,6 @@ def FnStartTthread():
                     print(f"Tunnel {tunnel.name} generated an exception: {str(e)}")
         except KeyboardInterrupt:
             print("Shutting down all tunnels...")
-
-
 
 
 if __name__ == "__main__":    
@@ -62,4 +64,10 @@ if __name__ == "__main__":
     print (f"{_LineLog}")
     tu.SaveLogWebsite(_LineLog)
     #autostart(TUNNEL_LIST)
-    FnStartTthread()
+    KeepAliveTunnelList = KeepAliveList()
+    if len(KeepAliveTunnelList) == 0:
+        _LineLog = f"### {timestamp},The keep-alive option is not enabled for any tunnel."
+        print (f"{_LineLog}")
+        tu.SaveLogWebsite(_LineLog)
+    else:
+        FnStartTthread(KeepAliveTunnelList)

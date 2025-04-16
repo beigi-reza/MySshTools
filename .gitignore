@@ -16,6 +16,8 @@ log/
 # Distribution / packaging
 key/
 /config/config.json
+/config/tunnel.json
+config/tunnel.json
 export/
 
 .Python

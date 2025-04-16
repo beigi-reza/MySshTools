@@ -1,17 +1,18 @@
 {    
     "tunnel": [
         {
-            "Name": "Outline",
+            "Name": "Outline Manager",
             "Code": "otl",
-            "ssh_ip" : "171.22.26.75",
+            "ssh_ip" : "194.146.123.231",
             "ssh_user" : "root",
-            "ssh_port" : "8086",            
-            "FinalPort": "443",
+            "ssh_port" : "3580",            
+            "FinalPort": "8100",
             "Source_Server": "localhost",
-            "Source_port": "443",
-            "Type" : "remote",
+            "Source_port": "8354",
+            "Type" : "local",
+            "Keep_Alive": true,
             "Highly_Restricted_Networks":{
-                "Enable" : true,
+                "Enable" : false,
                 "ExitOnForwardFailure" :"yes",
                 "ServerAliveInterval":60,
                 "ServerAliveCountMax":3,
@@ -19,40 +20,24 @@
             }                
         },
         {
-            "Name": "Outline Manager",
-            "Code": "mng",
-            "ssh_ip" : "171.22.26.75",
+            "Name": "SSH - ACCESS Server EN",
+            "Code": "En",
+            "ssh_ip" : "194.146.123.231",
             "ssh_user" : "root",
-            "ssh_port" : "8086",            
-            "FinalPort": "8354",
+            "ssh_port" : "3580",            
+            "FinalPort": "8200",
             "Source_Server": "localhost",
-            "Source_port": "8354",
+            "Source_port": "3580",
             "Type" : "remote",
+            "Keep_Alive": false,
             "Highly_Restricted_Networks":{
-                "Enable" : false,
+                "Enable" : true,
                 "ExitOnForwardFailure" :"yes",
                 "ServerAliveInterval":60,
                 "ServerAliveCountMax":3,
                 "MonitorPort": 2001
             }        
-        },
-        {
-            "Name": "Squid Proxy",
-            "Code": "sqd",
-            "ssh_ip" : "171.22.26.75",
-            "ssh_user" : "root",
-            "ssh_port" : "8086",            
-            "FinalPort": "80",
-            "Source_Server": "localhost",
-            "Source_port": "3128",
-            "Type" : "remote",
-            "Highly_Restricted_Networks":{
-                "Enable" : false,
-                "ExitOnForwardFailure" :"yes",
-                "ServerAliveInterval":60,
-                "ServerAliveCountMax":3,
-                "MonitorPort": 2002
-            }        
         }
+
     ]
 }
