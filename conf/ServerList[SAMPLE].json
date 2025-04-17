@@ -1,0 +1,52 @@
+{
+    "servers": [
+        {
+            "ServerName": "External Monitoring VPS",
+            "IP": "176.55.235.150",
+            "Port": "49150",
+            "User": "root",
+            "Tags": [
+                "Monitoring","VPS"
+            ],
+            "Code": "199",
+            "Group": "VPS",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Backup - Site",
+            "IP": "135.240.83.247",
+            "Port": "3031",
+            "User": "root",
+            "Tags": [
+                "backup","Reserve","56","VPS"
+            ],
+            "Code": "247",
+            "Group": "Backup",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Server 1",
+            "IP": "10.10.10.1",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "TAG","IR"
+            ],
+            "Code": "tms",
+            "Group": "TMS",
+            "Icon": "📖"
+        },
+        {
+            "ServerName": "Attlasian toolchain",
+            "IP": "10.10.10.58",
+            "Port": "22",
+            "User": "root",
+            "Tags": [
+                "Jira","Bitbucket","CI/CD"
+            ],
+            "Code": "jira",
+            "Group": "CICD",
+            "Icon": "📊"
+        }
+    ]
+}
