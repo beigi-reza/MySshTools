@@ -1,0 +1,41 @@
+{
+    "servers": [
+        {
+            "ServerName": "Pars Pack - DE - Cloud",
+            "IP": "82.115.18.62",
+            "Port": "2257",
+            "User": "root",
+            "Tags": [
+                "VPS","DE"
+            ],
+            "Code": "de",
+            "Group": "VPS",
+            "Icon": ""
+        },
+        {
+            "ServerName": "Pars Pack - IR - Cloud",
+            "IP": "171.22.26.75",
+            "Port": "8086",
+            "User": "root",
+            "Tags": [
+                "VPS","IR"
+            ],
+            "Code": "ir",
+            "Group": "VPS",
+            "Icon": ""
+        },
+       {
+            "ServerName": "Pars Pack - EN - Cloud",
+            "IP": "194.146.123.231",
+            "Port": "3580",
+            "User": "root",
+            "Tags": [
+                "VPS","EN"
+            ],
+            "Code": "en",
+            "Group": "VPS",
+            "Icon": ""
+        }
+	
+    ]
+}
