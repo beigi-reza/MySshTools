@@ -18,6 +18,7 @@ key/
 /config/config.json
 /config/tunnel.json
 config/tunnel.json
+/config/ServerList.json
 export/
 
 .Python
