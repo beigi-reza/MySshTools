@@ -7,7 +7,7 @@ import signal
 import os
 import core
 import sys
-import tunnel.tunnel as tunnel
+import tunnel
 from core import current_directory,JsonListFile,ServerConfigFile,SERVER_LIST,SSHKEY
 
 COLOR_LIST = ['_fw','_fy','_fb','_fbl','_fr','_fc','_fg','_fm','_fEx_w','_fEx_y','_fEx_b','_fEx_bl','_fEx_r','_fEx_c','_fEx_g','_fEx_m']
