@@ -119,6 +119,44 @@ def tunnleProgress(ServerDict = None ,Mode = 'local',GetValue = None):
     print(f'{_fy}│ {_reset}{TitleStr}{_sp}{_fy}│{_reset}')    
     print(f'{_fy}{LineDown}{_reset}')
 
+def TunnelHelp():
+    print('\n')
+    TunnelHelpMode(Mode = 'local',ColorBox = _fc)
+    TunnelHelpMode(Mode = 'remote',ColorBox = _fc)
+    TunnelHelpMode(Mode = 'dynamic',ColorBox = _fc)
+    print('')
+def TunnelHelpMode(Mode = 'local',ColorBox = _fy):
+
+    FirewallStr = f'🔥 Firewall'
+    R_Aro = f'➡'        
+    SourceStr = f'🔌 Source Address '
+    SShServr = f'🔑 SSH Server'
+    FinalPortTitle = f'🏁 Final Port'
+    ThisPc = f'🖥️  This Server '
+    DC = f'{_B}{_fw}'
+    S_Clr = f'{_B}{_fw}'
+    D_clr = f'{_B}{_fw}'
+
+
+    if Mode == 'local':        
+        TitleStr = f' {S_Clr}{SourceStr}{_reset}{R_Aro} {DC}{SShServr}{_reset} {R_Aro} {DC}{FirewallStr}{_reset} {R_Aro} {DC}{ThisPc}{_reset} {R_Aro} {D_clr}{FinalPortTitle} {_reset}'
+    elif Mode == 'remote':
+        TitleStr = f' {DC}{ThisPc}{_reset}{R_Aro} {S_Clr}{SourceStr}{_reset} {R_Aro} {DC}{FirewallStr}{_reset} {R_Aro} {DC}{SShServr}{_reset} {R_Aro} {D_clr}{FinalPortTitle} {_reset}'
+    elif Mode == 'dynamic':    
+        TitleStr = f' {S_Clr}{SourceStr}{_reset} {R_Aro} {DC}{SShServr}{_reset} {R_Aro} {DC}{FirewallStr}{_reset} {R_Aro} {DC}{ThisPc}{_reset}'        
+
+    LineUp = '┌─────────────────────────────────────────────────────────────────────────────────────┐'
+    LineDown = '└─────────────────────────────────────────────────────────────────────────────────────┘'
+
+    ModeTitle = lib.AsciArt.FnAlignmentStr(originalString = f'{Mode} >', target_length = 13)    
+    if Mode == 'dynamic':
+        _sp = ' ' * 17
+    else:
+        _sp = ' '
+    print(f'{" "*13}{ColorBox}{LineUp}{_reset}')
+    print(f'{ModeTitle}{ColorBox}│ {_reset}{TitleStr}{ColorBox}{_sp}│{_reset}')    
+    print(f'{" "*13}{ColorBox}{LineDown}{_reset}')
+
 
 def getSourceAddress(msg = ''):
     global SourceAddress

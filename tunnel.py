@@ -10,6 +10,8 @@ import time
 import sys
 import psutil
 
+import lib.TunnelWizard
+
 current_directory = os.path.dirname(os.path.realpath(__file__))
 JsonListFile = os.path.join(current_directory,'conf/config.json')
 JsonConfig = lib.BaseFunction.LoadJsonFile(JsonListFile)
@@ -18,8 +20,8 @@ SSHKEY = os.path.join(current_directory,'key',SSHKEYFile)
 TunnelJsonFilePath = os.path.join(current_directory,'conf/tunnel.json')
 TUNNEL_Json = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelJsonFilePath,Verbus=False,ReternValueForFileNotFound={})
 
-TUNNEL_LIST = TUNNEL_Json["tunnel"]
-
+#TUNNEL_LIST = TUNNEL_Json["tunnel"]
+TUNNEL_LIST = TUNNEL_Json.get("tunnel",[])
 _B = "[1m"
 _N = "[22m"
 _D = "[2m"
@@ -77,28 +79,40 @@ def MainMenu(Msg = ''):
         lib.BaseFunction.clearScreen()
         lib.Logo.sshTunnel()
         #RunWithRoot()
-        printTunnelList()                
+        if len(TUNNEL_LIST) > 0:
+            printTunnelList()
+        else:
+            print('\n')
+            lib.AsciArt.BorderIt(Text='No Tunnel Found',BorderColor=_fc,TextColor=_fr)
         if Msg != '':
             print("")
             print("")
             lib.AsciArt.BorderIt(Text=Msg,BorderColor=_fy,TextColor=_fEx_r)
             Msg = ''
-        print(f'\n\n{_fw}( {_fg}s {_fw}) Start all Tunnel{_reset}')
-        print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
-        print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')
-        print(f'{_fw}( . ) Enter tunnel code for more ...{_reset}')
-        print(f'\n{_D}q for quit{_reset}')
-        UserInput = input(f'{_B}{_fw}Or Enter tunnel Code :  {_reset}')        
-        if UserInput.strip().lower() in ['q','s','d','r','']:
-            if UserInput == 'q':
+        print(f'\n\n{_fw}( {_fc}c {_fw}) Create Tunnel{_reset}')        
+        commandList = ['','c','q']
+        if len(TUNNEL_LIST) > 0:
+            commandList = ['q','s','d','r','']
+            print('\n')
+            print(f'{_fw}( {_fg}s {_fw}) Start all Tunnel{_reset}')        
+            print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
+            print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')
+            print(f'{_fw}( . ) Enter tunnel code for more ...{_reset}')
+        print(f'\n{_D}q for quit{_reset}')        
+        UserInput = input(f'{_B}{_fw}Enter Command >  {_reset}')
+        if UserInput.strip().lower() in commandList:
+            if UserInput.strip().lower() == 'q':
                 lib.BaseFunction.FnExit()
-            elif UserInput == 's':
+            elif UserInput.strip().lower() == 's':
                 StartAllTunnel()
-            elif UserInput == 'd':
+            elif UserInput.strip().lower() == 'd':
                 DropAllSShTunnel()
-            elif UserInput == 'r':
+            elif UserInput.strip().lower() == 'r':                
                 DropAllSShTunnel()
                 StartAllTunnel()
+            elif UserInput.strip() == 'c':                
+                TunnelMode = CreateTunnelModeMenu()
+                CreateTunnle(TunnelMode)
             elif UserInput.strip() == '':
                 continue
         else:
@@ -113,6 +127,91 @@ def MainMenu(Msg = ''):
                 if Msg == '':
                     Msg = f"No server found ( {UserInput} )"
 
+def CreateTunnelModeMenu(ErrMsg = ''):
+    while True:
+        lib.BaseFunction.clearScreen()
+        lib.Logo.sshTunnel()
+        lib.TunnelWizard.TunnelHelp()        
+        if ErrMsg != '':
+            lib.AsciArt.BorderIt(Text=ErrMsg,BorderColor=_fr,TextColor=_fy)
+            ErrMsg = ''
+        msg = f'{_B}{_fw}\n Create New Tunnel [ Local / Remote / Dynamic ]{_reset}'
+        userInput = input(f'{msg} {_N}{_fy} [ L / R / D ] {_N}{_fw} > {_N}')
+        if userInput.lower().strip() in ['l','local']:
+            return 'local'
+        elif userInput.lower().strip() in ['r','remote']:
+            return 'remote'
+        elif userInput.lower().strip() in ['d','dynamic']:
+            return 'dynamic'
+        else:
+            ErrMsg = f"Invalid input: [ {userInput} ], Please enter 'L', 'R', or 'D'."
+            
+
+
+def CreateTunnle(Mode = None):
+    _Name = ''
+    _Code = ''
+    _ssh_ip = ''
+    _ssh_user = ''
+    _ssh_port = ''
+    _Source_Server = ''
+    _Source_port = ''
+    _FinalPort = ''
+    _Type = ''
+    _Keep_Alive = ''
+    _Highly_Restricted_Networks_Enable = ''
+    _monitorPort = ''    
+    TunnelDict = {
+        "Name": _Name,
+        "Code": _Code,
+        "ssh_ip": _ssh_ip,
+        "ssh_user": _ssh_user,
+        "ssh_port": _ssh_port,
+        "Source_Server": _Source_Server,
+        "Source_port": _Source_port,
+        "FinalPort": _FinalPort,
+        "Type": _Type,
+        "Keep_Alive": _Keep_Alive,
+        "Highly_Restricted_Networks": {
+            'Enable': _Highly_Restricted_Networks_Enable,
+            'MonitorPort': _monitorPort,
+            'ServerAliveInterval': '',
+            'ServerAliveCountMax': '',
+            'ExitOnForwardFailure': ''
+        }
+    }
+    while True:
+
+        if Mode == 'local':
+            LocalOrRemoteServerlable = "Local Server"
+        elif Mode == 'remote':
+            LocalOrRemoteServerlable = "Remote Server"    
+        elif Mode == 'dynamic':
+            LocalOrRemoteServerlable = "Local Server (Socks)"
+        else:
+            LocalOrRemoteServerlable = ""
+        
+        lib.BaseFunction.clearScreen()
+        lib.Logo.sshTunnel()
+        print("")
+        lib.TunnelWizard.TunnelHelpMode(Mode,ColorBox=_fc)
+
+        print(f"\nTunnel name : {_fc}{TunnelDict['Name']}{_reset}")
+        print(f"Tunnel code : {_fc}{TunnelDict['Code']}{_reset}")
+        print(f"Type : {_fc}{Mode}{_reset}")
+        print(f"Final Port on {LocalOrRemoteServerlable} : {_B}{_fc}{TunnelDict['FinalPort']}{_reset}")
+        print(f"SSH Server Details :")
+        print(f"  - IP : {_fc}{TunnelDict['ssh_ip']}{_reset}")
+        print(f"  - User : {_fc}{TunnelDict['ssh_user']}{_reset}")
+        print(f"  - Port : {_fc}{TunnelDict['ssh_port']}{_reset}")        
+        print (f"Advanced Options :")
+        print (f"  - Monitor Port : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('MonitorPort',0)}{_reset} Use Only for Highly Restricted Network Mode")
+        print (f"  - ServerAliveInterval : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveInterval',0)}{_reset}")
+        print (f"  - ServerAliveCountMax : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveCountMax',0)}{_reset}")
+        print (f"  - ExitOnForwardFailure : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ExitOnForwardFailure','no')}{_reset}")        
+        
+        print(f"\n\n --------------------")
+        lib.BaseFunction.PressEnterToContinue()
 
 def ViewTunnleStatus(TunnelDict,OnNewSession=True):
     while True:
@@ -126,11 +225,12 @@ def ViewTunnleStatus(TunnelDict,OnNewSession=True):
         else:
             print(f'\nTunnel is : {_fw}{_bb} STOP {_reset}')
             print(f"\nTunnel {_fw}{TunnelDict['Name']}{_fw} is not running.{_reset}")            
-        if {TunnelDict['Type'] == 'local'}:
+        if TunnelDict['Type'] == 'local':
             LocalOrRemoteServerlable = "Local Server"
-        else:
+        elif TunnelDict['Type'] == 'remote':
             LocalOrRemoteServerlable = "Remote Server"    
-
+        elif TunnelDict['Type'] == 'dynamic':            
+            LocalOrRemoteServerlable = "Local Server (Socks)"
         if TunnelDict["Highly_Restricted_Networks"].get('Enable',False):
             _mode = f'{_by}{_fbl} ENABLED '
         else:
@@ -682,7 +782,7 @@ signal.signal(signal.SIGINT, lib.BaseFunction.handler)
 #_debug = ['en']
 #sys.argv.extend(_debug)
 
-if __name__ == "__main__":
+if __name__ == "__main__":        
     if len(sys.argv) == 1:        
         MainMenu()
     elif len(sys.argv) == 2:        
