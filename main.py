@@ -2,12 +2,16 @@
 import lib.AsciArt
 import lib.BaseFunction
 import lib.Logo
+import lib.TunnelWizard
+import tunnel
 import scp
 import signal
 import os
 import core
 import sys
 import tunnel
+import json
+from tunnel import TunnelJsonFilePath,TUNNEL_Json,TUNNEL_LIST
 from core import current_directory,JsonListFile,ServerConfigFile,SERVER_LIST,SSHKEY
 
 COLOR_LIST = ['_fw','_fy','_fb','_fbl','_fr','_fc','_fg','_fm','_fEx_w','_fEx_y','_fEx_b','_fEx_bl','_fEx_r','_fEx_c','_fEx_g','_fEx_m']
@@ -186,9 +190,129 @@ def MainMenuLuncher(UserParameter = ''):
     elif UserCommand == 'c':
         scp.ScpMenu(ServerLst)
     elif UserCommand == 't':
-        print(f'\n{_fr}Tunnel{_reset}')
-        tunnel.printTunnlelist()
-    lib.BaseFunction.PressEnterToContinue()
+        #print(f'\n{_fr}Tunnel{_reset}')
+        #if tunnel.RunAsRoot() is False:
+        #tunnel.MainMenu()
+        lib.BaseFunction.clearScreen()
+        lib.Logo.SshToolsLogo()
+        #tunnel.printTunnelListHorizontal()        
+        TunnelType = lib.TunnelWizard.CreateNewTunnelMenu()
+        StartSshTunnel(TunnelType,ServerLst)
+        
+        ## Renove This Line
+        lib.BaseFunction.PressEnterToContinue()            
+
+
+
+def StartSshTunnel(TunnelType,ServerDict):
+    lib.BaseFunction.clearScreen()
+    lib.Logo.SshTunnelLogo()        
+    lib.TunnelWizard.tunnleProgress(Mode = TunnelType,ServerDict=ServerDict,GetValue='source_address')
+    
+    SourceAddress = lib.TunnelWizard.getSourceAddress()
+
+    if TunnelType != 'dynamic':
+        lib.BaseFunction.clearScreen()
+        lib.Logo.SshTunnelLogo()        
+        lib.TunnelWizard.tunnleProgress(Mode = TunnelType,ServerDict=ServerDict,GetValue='final_port')
+        Finalport = lib.TunnelWizard.GetFinalport()
+    else:
+        Finalport = 'N/A'
+    
+    lib.BaseFunction.clearScreen()
+    lib.Logo.SshTunnelLogo()        
+    lib.TunnelWizard.tunnleProgress(Mode = TunnelType,ServerDict=ServerDict,GetValue='confirm')
+    Createtunnel = lib.TunnelWizard.Createtunnel()    
+    ip,port = SourceAddress.split(':')
+    if Createtunnel[0] == True:
+        _tunnel = {
+            "Name": "",
+            "Code": "",
+            "ssh_ip" : ServerDict['IP'],
+            "ssh_user" : ServerDict['User'],
+            "ssh_port" : ServerDict['Port'],
+            "FinalPort": Finalport,
+            "Source_Server": ip,
+            "Source_port": port,
+            "Type" : TunnelType,
+            "Keep_Alive": False,
+            "Highly_Restricted_Networks":{
+                "Enable" : False,
+                "ExitOnForwardFailure" :"no",
+                "ServerAliveInterval":1,
+                "ServerAliveCountMax":3,
+                "MonitorPort": 0
+            }                
+        }
+        if Createtunnel[1] == 'save':
+            SaveTunnel(_tunnel)
+            tunnel.ViewTunnleStatus(_tunnel)
+        elif Createtunnel[1] == 'run':  
+            tunnel.ViewTunnleStatus(_tunnel,OnNewSession=False)
+
+
+
+
+def SaveTunnel(TunnelDict,msg = ''):
+        TUNNEL_LIST.append(TunnelDict)
+        TunnelJson = {
+            "tunnel" : TUNNEL_LIST
+        }
+        TunnelCode = ''
+        TunnelName = ''
+        while True:
+            lib.BaseFunction.clearScreen()
+            lib.Logo.SshTunnelLogo() 
+
+            if msg != '':
+                print(f"\n{_N}{_fr} {msg}{_reset}")
+                msg = ''
+            if {TunnelDict['Type'] == 'local'}:
+                LocalOrRemoteServerlable = "Local Server"
+            else:
+                LocalOrRemoteServerlable = "Remote Server"    
+
+            print(f"\nName : {_B}{_fy}{TunnelCode}{_reset}")
+            print(f"Code : {_B}{_fy}{TunnelName}{_reset}")
+            print(f"Type : {_B}{_fc}{TunnelDict['Type']}{_reset}")
+            print(f"IP : {_fc}{TunnelDict['ssh_ip']}{_reset}")
+            print(f"User : {_fc}{TunnelDict['ssh_user']}{_reset}")
+            print(f"Port : {_fc}{TunnelDict['ssh_port']}{_reset}")
+            print(f"Final Port on {LocalOrRemoteServerlable} : {_B}{_fc}{TunnelDict['FinalPort']}{_reset}")
+            print (f"Advanced Options :")
+            print (f"  - Monitor Port : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('MonitorPort',0)}{_reset} Use Only for Highly Restricted Network Mode")
+            print (f"  - ServerAliveInterval : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveInterval',0)}{_reset}")
+            print (f"  - ServerAliveCountMax : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ServerAliveCountMax',0)}{_reset}")
+            print (f"  - ExitOnForwardFailure : {_fc}{TunnelDict['Highly_Restricted_Networks'].get('ExitOnForwardFailure','no')}{_reset}")        
+            
+            if TunnelCode == '':                
+                TunnelCode = input(f' \n{_B}{_fw}Enter Code for Tunnel > {_reset}')
+                if TunnelCode.strip() == '':
+                    continue
+                for _ in TUNNEL_LIST:
+                    if _['Code'].lower().strip() == TunnelCode.strip().lower():
+                            msg = 'Tunnel Code Already Exist'                        
+                            TunnelCode = ''
+                            break
+                if msg != '':
+                    tunnelCode = ''
+                continue    
+            if TunnelName == '':                
+                TunnelName = input(f'{_B}{_fw}\nEnter Name for Tunnel > {_reset}')                
+                continue
+            else:
+                TunnelDict['Code'] = TunnelCode
+                TunnelDict['Name'] = TunnelName
+                try:
+                    with open(TunnelJsonFilePath, 'w') as json_file:
+                        json.dump(TunnelJson, json_file, indent=4)
+                        print(f"{_B}{_fw}\nTunnel [ {_fEx_g}{TunnelName}{_fw} ] Saved Successfully{_reset}")
+                        lib.BaseFunction.PressEnterToContinue()
+                        return True
+                except:
+                    print(f"{_fr}Error on Update [ {TunnelJsonFilePath} ] operation Faild{_reset}\n")
+                    lib.BaseFunction.PressEnterToContinue()
+                    return False    
 
 
 def ConnectSSH(ServerLst):
@@ -198,6 +322,8 @@ def ConnectSSH(ServerLst):
     if SSHKEY != '':
         if lib.BaseFunction.isFile(SSHKEY,Title="Custom SSH KEY",Verbus=False):
             Ssh_Command = f'ssh -i {SSHKEY} -p {Port} {User}@{Ip}'
+        else:
+            Ssh_Command = f'ssh -p {Port} {User}@{Ip}'        
     else:
             Ssh_Command = f'ssh -p {Port} {User}@{Ip}'    
                 

@@ -15,8 +15,8 @@ JsonListFile = os.path.join(current_directory,'conf/config.json')
 JsonConfig = lib.BaseFunction.LoadJsonFile(JsonListFile)
 SSHKEYFile = lib.BaseFunction.GetValue(JsonConfig,"SSHKEY",verbus=False,ReturnValueForNone='')
 SSHKEY = os.path.join(current_directory,'key',SSHKEYFile)
-TunnelDict = os.path.join(current_directory,'conf/tunnel.json')
-TUNNEL_Json = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelDict,Verbus=False,ReternValueForFileNotFound={})
+TunnelJsonFilePath = os.path.join(current_directory,'conf/tunnel.json')
+TUNNEL_Json = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelJsonFilePath,Verbus=False,ReternValueForFileNotFound={})
 
 TUNNEL_LIST = TUNNEL_Json["tunnel"]
 
@@ -76,7 +76,7 @@ def MainMenu(Msg = ''):
     while True:        
         lib.BaseFunction.clearScreen()
         lib.Logo.sshTunnel()
-        RunWithRoot()
+        #RunWithRoot()
         printTunnelList()                
         if Msg != '':
             print("")
@@ -114,7 +114,7 @@ def MainMenu(Msg = ''):
                     Msg = f"No server found ( {UserInput} )"
 
 
-def ViewTunnleStatus(TunnelDict):
+def ViewTunnleStatus(TunnelDict,OnNewSession=True):
     while True:
         rst = CheckStatusTunnel(TunnelDict)
         lib.BaseFunction.clearScreen()
@@ -193,7 +193,8 @@ def ViewTunnleStatus(TunnelDict):
                 lib.BaseFunction.FnExit()
             elif UserInput == 's':
                 if rst[0] is False:
-                    FnStartTunnel(TunnelDict)
+                    FnStartTunnel(TunnelDict,StartNewSession=OnNewSession)
+
             elif UserInput == 'd':                    
                 if rst[0]:
                     KillProcessByPID(rst[1])
@@ -234,19 +235,6 @@ def KillProcessByPID(pid,Verbus=False):
         if Verbus:
             print(f"Error killing process {pid}: {e}")
         return False
-
-
-#def printTunnelList():
-#    TitleStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Name (code)', target_length=20, AlignmentMode='center')}{_reset}"
-#    TypeStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Type', target_length=10, AlignmentMode='center')}{_reset}"
-#    SourceStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Source', target_length=18, AlignmentMode='center')}{_reset}"
-#    SSHServerStr = f"{_bb}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='SSH Server', target_length=30, AlignmentMode='center')}{_reset}"
-#    FinalPortStr = f"{_by}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Final Port', target_length=30, AlignmentMode='center')}{_reset}"
-#    ModeStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Mode', target_length=6, AlignmentMode='center')}{_reset}"
-#    print(f"\n{ModeStr} {TitleStr} {TypeStr} {SourceStr} {SSHServerStr} {FinalPortStr}\n")
-#    for _ in TUNNEL_LIST:
-#        a = GenerateTunnelLine(_)
-#        print(a)
 
 
 def printTunnelList():
@@ -314,56 +302,69 @@ def printTunnelList():
 
         #return f"{_Mode} {_Title} {_type} {_SourceOrRemote} {_SshServer} {_FinalPort}"
 
-#def GenerateTunnelLine(Tunnel):
-#    _LServer = lib.BaseFunction.GetValue(Tunnel, "Source_Server")
-#    _LPort = lib.BaseFunction.GetValue(Tunnel, "Source_port")
-#    _sshPort = lib.BaseFunction.GetValue(Tunnel, "ssh_port")
-#    _sshIp = lib.BaseFunction.GetValue(Tunnel, "ssh_ip")
-#    _sshUser = lib.BaseFunction.GetValue(Tunnel, "ssh_user")
-#    _Type = lib.BaseFunction.GetValue(Tunnel, "Type").upper()
-#    if _Type == "LOCAL":
-#        _tColor = _fb
-#        _FinalIP = lib.BaseFunction.GetLocalIP()        
-#    elif _Type == "REMOTE":
-#        _tColor = _fc
-#        _FinalIP = f'{Tunnel["ssh_ip"]}'
-#    elif _Type == "DYNAMIC":
-#        _tColor = _fm
-#        _FinalIP = f'{Tunnel["ssh_ip"]}'
-#    else:
-#        _tColor = _fw
-#        _FinalIP = ' - '
-#    _rst = CheckStatusTunnel(Tunnel)
-#    if _rst[0]:
-#        _Icon = '▶️'        
-#        _FinalPort = f'{_Icon}  {_FinalIP}:{Tunnel["FinalPort"]}'
-#        _clPort = f'{_bg}{_fbl}'        
-#    else:
-#        _Icon = '⏸️'        
-#        _FinalPort = f'{_Icon}  {Tunnel["FinalPort"]}'
-#        _clPort = f'{_fw}'        
-#    if Tunnel.get('Keep_Alive',False):
-#        _keppAlive = '🔒'
-#    else:
-#        _keppAlive = '🔓'
-#    if Tunnel["Highly_Restricted_Networks"].get('Enable',False):
-#        ModeChr = f'✨ {_keppAlive}'        
-#    else:
-#        ModeChr = f'🔗 {_keppAlive}'
-#    #FullName = f"{Tunnel['Name']} ({_fy}{Tunnel['Code']}{_fw})"
-#    FullName = f"{Tunnel['Name']} ({Tunnel['Code']})"
-#    _Title = f"{_fw}{lib.AsciArt.FnAlignmentStr(originalString=FullName, target_length=20, AlignmentMode='left')}{_reset}"
-#    _SourceOrRemote = f"{_fw}{lib.AsciArt.FnAlignmentStr(originalString=f'{_LServer}:{_LPort}', target_length=18, AlignmentMode='left')}{_reset}"
-#    _SshServer = f"{_fw}{lib.AsciArt.FnAlignmentStr(originalString=f'{_sshUser}@{_sshIp}:{_sshPort}', target_length=30, AlignmentMode='left')}{_reset}"
-#    _FinalPort = f"{_clPort}{lib.AsciArt.FnAlignmentStr(originalString=_FinalPort , target_length=30, AlignmentMode='left')}{_reset}"
-#    _type = f"{_tColor}{lib.AsciArt.FnAlignmentStr(_Type, target_length=10, AlignmentMode='left')}{_reset}"
-#    _Mode = f"{_fy}{lib.AsciArt.FnAlignmentStr(ModeChr, target_length=6, AlignmentMode='left')}{_reset}"
-#    return f"{_Mode} {_Title} {_type} {_SourceOrRemote} {_SshServer} {_FinalPort}"
+def printTunnelListHorizontal():
+    TitleStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Name (code)', target_length=50, AlignmentMode='center')}{_reset}"
+    TypeStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Type', target_length=10, AlignmentMode='center')}{_reset}"
+    SourceStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Source', target_length=18, AlignmentMode='center')}{_reset}"
+    SSHServerStr = f"{_bb}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='SSH Server', target_length=30, AlignmentMode='center')}{_reset}"
+    FinalPortStr = f"{_by}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Final Port', target_length=30, AlignmentMode='center')}{_reset}"
+    ModeStr = f"{_bw}{_fbl}{lib.AsciArt.FnAlignmentStr(originalString='Mode', target_length=6, AlignmentMode='center')}{_reset}"
+    print(f"\n{ModeStr} {TitleStr} {TypeStr} {SourceStr} {SSHServerStr} {FinalPortStr}\n")
+    for _ in TUNNEL_LIST:
+        a = GenerateTunnelLine(_)
+        print(a)
 
 
-def RunWithRoot():            
+def GenerateTunnelLine(Tunnel):
+    _LServer = lib.BaseFunction.GetValue(Tunnel, "Source_Server")
+    _LPort = lib.BaseFunction.GetValue(Tunnel, "Source_port")
+    _sshPort = lib.BaseFunction.GetValue(Tunnel, "ssh_port")
+    _sshIp = lib.BaseFunction.GetValue(Tunnel, "ssh_ip")
+    _sshUser = lib.BaseFunction.GetValue(Tunnel, "ssh_user")
+    _Type = lib.BaseFunction.GetValue(Tunnel, "Type").upper()
+    if _Type == "LOCAL":
+        _tColor = _fb
+        _FinalIP = lib.BaseFunction.GetLocalIP()        
+    elif _Type == "REMOTE":
+        _tColor = _fc
+        _FinalIP = f'{Tunnel["ssh_ip"]}'
+    elif _Type == "DYNAMIC":
+        _tColor = _fm
+        _FinalIP = f'{Tunnel["ssh_ip"]}'
+    else:
+        _tColor = _fw
+        _FinalIP = ' - '
+    _rst = CheckStatusTunnel(Tunnel)
+    if _rst[0]:
+        _Icon = '▶️'        
+        _FinalPort = f'{_Icon}  {_FinalIP}:{Tunnel["FinalPort"]}'
+        _clPort = f'{_bg}{_fbl}'        
+    else:
+        _Icon = '⏸️'        
+        _FinalPort = f'{_Icon}  {Tunnel["FinalPort"]}'
+        _clPort = f'{_fw}'        
+    if Tunnel.get('Keep_Alive',False):
+        _keppAlive = '🔒'
+    else:
+        _keppAlive = '🔓'
+    if Tunnel["Highly_Restricted_Networks"].get('Enable',False):
+        ModeChr = f'✨ {_keppAlive}'        
+    else:
+        ModeChr = f'🔗 {_keppAlive}'
+    #FullName = f"{Tunnel['Name']} ({_fy}{Tunnel['Code']}{_fw})"
+    FullName = f"{Tunnel['Name']} ({Tunnel['Code']})"
+    _Title = f"{_fw}{lib.AsciArt.FnAlignmentStr(originalString=FullName, target_length=50, AlignmentMode='left')}{_reset}"
+    _SourceOrRemote = f"{_fw}{lib.AsciArt.FnAlignmentStr(originalString=f'{_LServer}:{_LPort}', target_length=18, AlignmentMode='left')}{_reset}"
+    _SshServer = f"{_fw}{lib.AsciArt.FnAlignmentStr(originalString=f'{_sshUser}@{_sshIp}:{_sshPort}', target_length=30, AlignmentMode='left')}{_reset}"
+    _FinalPort = f"{_clPort}{lib.AsciArt.FnAlignmentStr(originalString=_FinalPort , target_length=30, AlignmentMode='left')}{_reset}"
+    _type = f"{_tColor}{lib.AsciArt.FnAlignmentStr(_Type, target_length=10, AlignmentMode='left')}{_reset}"
+    _Mode = f"{_fy}{lib.AsciArt.FnAlignmentStr(ModeChr, target_length=6, AlignmentMode='left')}{_reset}"
+    return f"{_Mode} {_Title} {_type} {_SourceOrRemote} {_SshServer} {_FinalPort}"
+
+
+def RunWithRoot():
     if lib.BaseFunction.User_is_root() is False:
-        msg1 = """Tunnel Funcyion requires root privileges, Attempting to restart with sudo..."""
+        msg1 = """Tunnel Function requires root privileges, Attempting to restart with sudo..."""
         print('\n\n')
         lib.AsciArt.BorderIt(Text=msg1,BorderColor=_fr,TextColor=_fy,WidthBorder=100)
         print('\n\n')
@@ -375,7 +376,18 @@ def RunWithRoot():
         except subprocess.CalledProcessError:
             print("Failed to run with elevated privileges.")
             lib.BaseFunction.FnExit()
-            
+
+def RunAsRoot():
+    if lib.BaseFunction.User_is_root() is False:
+        msg1 = """Tunnel Function requires root privileges"""
+        print('\n\n')
+        lib.AsciArt.BorderIt(Text=msg1,BorderColor=_fr,TextColor=_fy,WidthBorder=100)
+        print('\n\n')        
+        lib.BaseFunction.PressEnterToContinue()
+        return False
+    return True
+
+
 def CreateCommamd(TunnleDict,TypeOfTunnel):        
     Highly_Restricted_Networks = TunnleDict["Highly_Restricted_Networks"].get('Enable',False)
     if Highly_Restricted_Networks: 
@@ -421,7 +433,7 @@ def CreateCommamd(TunnleDict,TypeOfTunnel):
     return CommandLst
 
 
-def FnStartTunnel(TunnleDict):
+def FnStartTunnel(TunnleDict = None,StartNewSession = True):
     Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower())    
     try:
         process = subprocess.Popen(
@@ -429,7 +441,7 @@ def FnStartTunnel(TunnleDict):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,        
             stdin=subprocess.DEVNULL,
-            start_new_session=True,            
+            start_new_session=StartNewSession,            
             )            
         time.sleep(1)        
         _rst = CheckStatusTunnel(TunnleDict)

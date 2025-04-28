@@ -670,7 +670,13 @@ def GetLocalIP(Verbus = False):
             print (f"Error determining local IP: {e}")
         return None
 
-
+def FnIsValidIP(ip):
+    try:
+        socket.inet_aton(ip)
+        return True
+    except socket.error:
+        return False
+    
 
 if __name__ == "__main__":    
   print(f"{Style.NORMAL + Fore.YELLOW}You should not run this file directly")
