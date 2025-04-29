@@ -77,8 +77,9 @@ def ConnectMenu(ServerCode):
         print(f'\n{_N}{_fw}( {_fy}S{_fw} ) {_fy}for SSH{_reset}')
         print(f'{_N}{_fw}( {_fc}c{_fw} ) {_fc}for SCP{_reset}')
         print(f'{_N}{_fw}( {_fg}T{_fw} ) {_fg}for Tunnel{_reset}')        
-        InpustStr = f"{_B}{_fw}Type [ {_fy}S{_fw} | {_fc}C{_fw} | {_fg}T{_fw} | Q ]"
-        UserInput = input(f'\n{InpustStr} : {_reset}')
+        #InpustStr = f"{_B}{_fw}Type [ {_fy}S{_fw} | {_fc}C{_fw} | {_fg}T{_fw} | Q ]"
+        InpustStr = f"{_B}{_fw}Type [ {_fy}S{_fw} / {_fc}C{_fw} / {_fg}T{_fw} / Q ]"
+        UserInput = input(f'\n{InpustStr} > {_reset}')
         if UserInput == '':
             UserInput = 's'
         if UserInput.lower().strip() in ['s','c','t','q']:
@@ -104,12 +105,12 @@ def MainMenu(msg=''):
                 if UserInput != '':
                     if UserInput.strip() in _SrvList:
                             _CopdeFoundInServerlist = True                           
-        print(f'{_N}{_fw}\nfor Quit ( {_D}ctrl + c{_N} ) or ( {_D}q{_N} ){_reset}')
+        print(f'{_D}\nQuit ( {_N}ctrl + c{_D} ) or ( {_N}q{_D} ){_reset}')
         if _CopdeFoundInServerlist:            
             _code = UserInput
-            UserInput = input(f'{_B}{_fw}Press {_fr}ENTER{_fw} for [ {_br}  {_code}  {_reset}{_fw} ] or Type for servers : {_reset}')
+            UserInput = input(f'{_B}{_fw}Press {_fr}ENTER{_fw} for [ {_br}  {_code}  {_reset}{_fw} ] or Type for servers > {_reset}')
         else:
-            UserInput = input(f'{_B}{_fw}Type for servers: {_reset}')
+            UserInput = input(f'{_B}{_fw}Type for servers > {_reset}')
             
         if UserInput.lower().strip() == 'q':
             lib.BaseFunction.FnExit()
@@ -196,6 +197,7 @@ def MainMenuLuncher(UserParameter = ''):
         lib.BaseFunction.clearScreen()
         lib.Logo.SshToolsLogo()
         #tunnel.printTunnelListHorizontal()        
+        lib.TunnelWizard.TunnelHelp()
         TunnelType = lib.TunnelWizard.CreateNewTunnelMenu()
         StartSshTunnel(TunnelType,ServerLst)
         

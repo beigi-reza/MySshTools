@@ -155,10 +155,11 @@ def SpecifyingFomOrTo(ServerList):
         lib.Logo.ScpProgress(SourceLst=SourceLst,destinationLst=destinationLst,SourcePath=SourcePath,DestPath=DestPath,mode='')
         core.printServerInfo(ServerList["Code"])        
         print(f'\n\n{_B}{_fw}Server [ {_fEx_y}{ServerList["ServerName"]} ( {_bEx_y}{_fbl}{ServerList["IP"]}{_reset}{_B} {_fEx_y}) ]{_fw} is {_fEx_g}Source{_fw} or {_fEx_c}Destination{_fw} ?{_reset}')
-        UserInput = input(f'{_B}{_fEx_g}ENTER{_fw} for source or {_fEx_c}Any Key{_fw} for destination{_reset} : ')
-        if UserInput.strip() == '':
+        #UserInput = input(f'{_B}{_fEx_g}ENTER{_fw} for source or {_fEx_c}Any Key{_fw} for destination{_reset} : ')        
+        UserInput = input(f'{_B}{_fw}Type [ {_fEx_g}f / s {_fw}] for Source or [ {_fEx_c}d / t{_fw} ] for Destination  > {_reset}')
+        if UserInput.strip() in ['','f','s','source','from']:
             return 'FROM'
-        else:
+        elif UserInput.strip() in ['d','destination','to','t']:
             return 'TO'
     
 def SearchServer(msg='',Mode = 'Destination',LocalIsValid = True,mode=''):
@@ -189,7 +190,7 @@ def SearchServer(msg='',Mode = 'Destination',LocalIsValid = True,mode=''):
                 print(f'{_N}{_fw}for Select local Server Press ( {_D}Enter {_N} ) or type ( {_D}.{_N} ){_reset}')            
                 if Mode == 'Source':
                     print(f'{_N}{_fw}or Enter the {_D}File number{_N}, {_D}file name{_N} or {_D}Full address{_reset}')
-            UserInput = input(f'{_B}{_fw}Type for {_fr}{Mode}{_fw} servers: {_reset}')                            
+            UserInput = input(f'{_B}{_fw}Type for {_fr}{Mode}{_fw} servers > {_reset}')
         if UserInput.lower().strip() in ['q']:
             lib.BaseFunction.FnExit()            
         else:
@@ -255,7 +256,7 @@ def GetAddress(InLocal = False,EnterIsValid = False,mode = ''):
         print(f'{_fw}\n - Enter the full path address of the {_fb}file{_fw} or {_fb}directory{_fw}.')
         if InLocal:
             print(f'{_fw}- If the {_fb}file{_fw} or {_fb}directory{_fw} is in the current path, we can enter its {_fy}name{_fw} or {_fy}number{_fw}.{_reset}')
-        UserInput = input(f'{_B}{_fw}Enter FileName : {_reset}')
+        UserInput = input(f'{_B}{_fw}Enter FileName > {_reset}')
         
         ## VALIDATE
         if UserInput.lower().strip() in ['','.']:

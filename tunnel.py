@@ -92,7 +92,7 @@ def MainMenu(Msg = ''):
         print(f'\n\n{_fw}( {_fc}c {_fw}) Create Tunnel{_reset}')        
         commandList = ['','c','q']
         if len(TUNNEL_LIST) > 0:
-            commandList = ['q','s','d','r','']            
+            commandList = ['q','s','d','r','','c']
             print(f'{_fw}( {_fg}s {_fw}) Start all Tunnel{_reset}')        
             print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
             print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')            
@@ -155,7 +155,7 @@ def CreateTunnelModeMenu(ErrMsg = ''):
     while True:
         lib.BaseFunction.clearScreen()
         lib.Logo.sshTunnel()
-        lib.TunnelWizard.TunnelHelp()        
+        lib.TunnelWizard.TunnelHelp(Color=_fc)
         if ErrMsg != '':
             lib.AsciArt.BorderIt(Text=ErrMsg,BorderColor=_fr,TextColor=_fy)
             ErrMsg = ''

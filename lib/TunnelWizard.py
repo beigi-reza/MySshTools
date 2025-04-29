@@ -50,7 +50,7 @@ DestinationPort = ''
 
 
 def CreateNewTunnelMenu():
-    while True:
+    while True:        
         msg = f'{_B}{_fw}\n Create New Tunnel [ Local / Remote / Dynamic ]{_reset}'
         userInput = input(f'{msg} {_N}{_fy} [ L / R / D ] {_N}{_fw} > {_N}')
         if userInput.lower().strip() in ['l','local']:
@@ -119,11 +119,11 @@ def tunnleProgress(ServerDict = None ,Mode = 'local',GetValue = None):
     print(f'{_fy}│ {_reset}{TitleStr}{_sp}{_fy}│{_reset}')    
     print(f'{_fy}{LineDown}{_reset}')
 
-def TunnelHelp():
+def TunnelHelp(Color = _fy):
     print('\n')
-    TunnelHelpMode(Mode = 'local',ColorBox = _fc)
-    TunnelHelpMode(Mode = 'remote',ColorBox = _fc)
-    TunnelHelpMode(Mode = 'dynamic',ColorBox = _fc)
+    TunnelHelpMode(Mode = 'local',ColorBox = Color)
+    TunnelHelpMode(Mode = 'remote',ColorBox = Color)
+    TunnelHelpMode(Mode = 'dynamic',ColorBox = Color)
     print('')
 def TunnelHelpMode(Mode = 'local',ColorBox = _fy):
 
