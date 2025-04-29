@@ -148,13 +148,13 @@ def TunnelHelpMode(Mode = 'local',ColorBox = _fy):
     LineUp = '┌─────────────────────────────────────────────────────────────────────────────────────┐'
     LineDown = '└─────────────────────────────────────────────────────────────────────────────────────┘'
 
-    ModeTitle = lib.AsciArt.FnAlignmentStr(originalString = f'{Mode} >', target_length = 13)    
+    ModeTitle = lib.AsciArt.FnAlignmentStr(originalString = f'{Mode.upper()} >', target_length = 13)
     if Mode == 'dynamic':
         _sp = ' ' * 17
     else:
         _sp = ' '
     print(f'{" "*13}{ColorBox}{LineUp}{_reset}')
-    print(f'{ModeTitle}{ColorBox}│ {_reset}{TitleStr}{ColorBox}{_sp}│{_reset}')    
+    print(f'{ColorBox}{ModeTitle}│ {_reset}{TitleStr}{ColorBox}{_sp}│{_reset}')    
     print(f'{" "*13}{ColorBox}{LineDown}{_reset}')
 
 
