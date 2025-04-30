@@ -93,10 +93,10 @@ def MainMenu(Msg = ''):
         commandList = ['','c','q']
         if len(TUNNEL_LIST) > 0:
             commandList = ['q','s','d','r','','c']
-            print(f'{_fw}( {_fg}s {_fw}) Start all Tunnel{_reset}')        
-            print(f'{_fw}( {_fr}d {_fw}) Drop all Tunnel{_reset}')
-            print(f'{_fw}( {_fr}r {_fw}) Restart all Tunnel{_reset}')            
-            print(f'{_fw}( . ) Enter tunnel code for more ...{_reset}')
+            print(f'{_fw}( {_fb}s {_fw}) Start all Tunnel{_reset}')        
+            print(f'{_fw}( {_fb}d {_fw}) Drop all Tunnel{_reset}')
+            print(f'{_fw}( {_fb}r {_fw}) Restart all Tunnel{_reset}')            
+            print(f'{_fw}( {_fy}* {_fw}) Enter tunnel {_fy}code{_fw} for Tunnel Detail{_reset}')
         print(f'\n{_D}q for quit{_reset}')        
         UserInput = input(f'{_B}{_fw}Enter Command >  {_reset}')
         if UserInput.strip().lower() in commandList:
@@ -455,12 +455,12 @@ def ViewTunnleStatus(TunnelDict,OnNewSession=True):
         else:
             print (f'\n{"-"*50}')
         if rst[0]:
-            print(f'\n{_fw}( {_fr}s {_fw}) for Stop Tunnel.{_reset}')
+            print(f'\n{_fw}( {_fc}s {_fw}) Stop Tunnel.{_reset}')
         else    :
-            print(f'\n{_fw}( {_fy}r{_fw} ) for Start Tunnel.{_reset}')    
-        print(f'{_fw}( {_fr}d {_fw}) for Delete Tunnel.{_reset}')
-        print(f'{_fw}( {_fw}Enter {_fw}) for Check Status.{_reset}')
+            print(f'\n{_fw}( {_fc}s{_fw} ) Start Tunnel.{_reset}')    
+        print(f'{_fw}( {_fr}d {_fw}) Delete Tunnel.{_reset}')        
         print(f'{_fw}( {_fc}0 {_fw}) Back to Start Menu.{_reset}')
+        print(f'{_fw}( {_fc}Enter {_fw}) Check Status.{_reset}')
         print(f'\n{_D}q for quit{_reset}')
         UserInput = input(f'{_B}{_fw}Enter Command :  {_reset}')        
         if UserInput.strip().lower() in ['0','s','q','r','d']:
@@ -470,13 +470,12 @@ def ViewTunnleStatus(TunnelDict,OnNewSession=True):
                 else:
                     return False
             elif UserInput == 'q':
-                lib.BaseFunction.FnExit()
-            elif UserInput == 'r':
-                if rst[0] is False:
-                    FnStartTunnel(TunnelDict,StartNewSession=OnNewSession)
+                lib.BaseFunction.FnExit()                                
             elif UserInput == 's':
                 if rst[0]:
                     KillProcessByPID(rst[1])
+                else:    
+                    FnStartTunnel(TunnelDict,StartNewSession=OnNewSession)                    
             elif UserInput == 'd':        
                 _confirm = input(f'\n{_fr}Are you sure you want to delete the tunnel? [ Y / N ] > {_reset}')
                 if _confirm.lower().strip() in ['y','yes']:
