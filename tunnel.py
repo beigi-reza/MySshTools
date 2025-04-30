@@ -254,7 +254,8 @@ def CreateTunnle(Mode = None,Msg = ''):
                     ip,port = _Source_Server.split(':')
                     if port.isdigit() and len(port) < 6 and len(port) > 0 and int(port) > 0 and int(port) < 65535:
                         SourceAddress = _Source_Server.strip()
-                        TunnelDict['Source_Server'] = _Source_Server
+                        TunnelDict['Source_Server'] = ip
+                        TunnelDict['Source_port'] = port
                         continue
                     else:
                         Msg = f'Invalid Port on Source Adress, Please enter a valid port number between 1 and 65535'
@@ -262,9 +263,9 @@ def CreateTunnle(Mode = None,Msg = ''):
                         continue                        
                 else:
                     try:
-                        if int(_Source_Server.strip()) > 0 and int(_Source_Server.strip()) < 65535:
-                            SourceAddress = f'localhost:{_Source_Server.strip()}'                        
-                            TunnelDict['Source_Server'] = SourceAddress
+                        if int(_Source_Server.strip()) > 0 and int(_Source_Server.strip()) < 65535:                            
+                            TunnelDict['Source_Server'] = 'localhost'
+                            TunnelDict['Source_port'] = _Source_Server.strip()
                             continue
                         else:
                             Msg = f'Invalid Port on Source Adress, Please enter a valid port number between 1 and 65535'
@@ -379,7 +380,7 @@ def PrintTunnelDetailsOnCreateTunnel(TunnelDict):
     print (f"\nTunnel name : {_B}{_fc}{TunnelDict['Name']}{_reset}")
     print (f"Tunnel code : {_B}{_fc}{TunnelDict['Code']}{_reset}")
     print (f"Type : {_B}{_fy}{TunnelDict['Type']}{_reset}")
-    print (f"Source Address : {_B}{_fy}{TunnelDict['Source_Server']}{_reset}")
+    print (f"Source Address : {_B}{_fy}{TunnelDict['Source_Server']}:{TunnelDict['Source_port']}{_reset}")
     print (f"Final Port on {LocalOrRemoteServerlable} : {_B}{_fy}{TunnelDict['FinalPort']}{_reset}")
     print (f"SSH Server Details :")
     print (f"  - IP : {_B}{_fy}{TunnelDict['ssh_ip']}{_reset}")
