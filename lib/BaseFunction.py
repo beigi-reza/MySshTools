@@ -8,7 +8,7 @@
 
 import json
 from tabnanny import verbose
-from colorama import Fore, Back, Style
+from click import style
 from datetime import datetime
 import sys
 import os
@@ -16,31 +16,12 @@ from os import system, name
 from time import sleep
 import shutil
 import socket
-
-
-#######################################################
-_B = Style.BRIGHT
-_N = Style.NORMAL
-_D = Style.DIM
-_w = Fore.WHITE
-_y = Fore.YELLOW
-_b = Fore.BLUE
-_r = Fore.RED
-_c = Fore.CYAN
-_g = Fore.GREEN
-_bl = Fore.BLACK
-_lb = Fore.LIGHTBLUE_EX 
-_lc = Fore.LIGHTCYAN_EX
-_ly = Fore.LIGHTYELLOW_EX
-_lr = Fore.LIGHTRED_EX
-_reset = Style.RESET_ALL
-_Br = Back.RED
-_Bb = Back.BLUE
-_By = Back.YELLOW + Fore.WHITE
-_Bg = Back.GREEN
-_Bw = Back.WHITE
-#######################################################
-
+import color.Back as Back
+import color.Fore as Fore
+import color.Style as Style
+from color.Style import _B,_D,_N,_reset
+from color.Back import _bw,_by,_bb,_bbl,_br,_bc,_bg,_bm,_brst,_bEx_w,_bEx_y,_bEx_b,_bEx_bl,_bEx_r ,_bEx_c ,_bEx_g ,_bEx_m ,_b_rest
+from color.Fore import _fw,_fy,_fb,_fbl,_fr,_fc,_fg,_fm,_fEx_w,_fEx_y,_fEx_b,_fEx_bl,_fEx_r,_fEx_c,_fEx_g,_fEx_m,_f_reset
 
 def clearScreen():
     # for windows

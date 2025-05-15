@@ -1,11 +1,11 @@
 #! /usr/bin/python3
 
 import lib.BaseFunction
-import tunnel.tunnel as tu
+import tunnel as tu
 import concurrent.futures
 from datetime import datetime, timedelta
 import os
-from tunnel.tunnel import ( 
+from tunnel import ( 
     TUNNEL_LIST 
 )
 from core import (

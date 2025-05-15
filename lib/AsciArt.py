@@ -1,9 +1,10 @@
 #####################################################
 # Fn_CenterString
 # Update GetValue - 1403-09-03
-from colorama import Fore, Back, Style
-
-
+#from colorama import Fore, Back, Style
+import color.Back as Back
+import color.Fore as Fore
+import color.Style as Style
 
 
 def FnAlignmentStr(originalString: str, target_length: int, padding_char: str = " ",AlignmentMode = "center") -> str:

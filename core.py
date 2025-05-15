@@ -1,69 +1,23 @@
+from sympy import true
 import lib.BaseFunction
 import lib.Logo
 import lib.AsciArt
 import os
+from color.Style import _B,_D,_N,_reset
+from color.Back import _bw,_by,_bb,_bbl,_br,_bc,_bg,_bm,_brst,_bEx_w,_bEx_y,_bEx_b,_bEx_bl,_bEx_r ,_bEx_c ,_bEx_g ,_bEx_m ,_b_rest
+from color.Fore import _fw,_fy,_fb,_fbl,_fr,_fc,_fg,_fm,_fEx_w,_fEx_y,_fEx_b,_fEx_bl,_fEx_r,_fEx_c,_fEx_g,_fEx_m,_f_reset
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 JsonListFile = os.path.join(current_directory,'conf/config.json')
 JsonConfig = lib.BaseFunction.LoadJsonFile(JsonListFile)
 ServerConfigFile = os.path.join(current_directory,'conf/ServerList.json')
-#TunnelDict = os.path.join(current_directory,'conf/tunnel.json')
 SERVER_LIST = lib.BaseFunction.LoadJsonFile(ServerConfigFile)["servers"]
 TAG_VIEW = lib.BaseFunction.GetValue(JsonConfig,"Tag_View",verbus=False,ReturnValueForNone=False)
 SSHKEY = lib.BaseFunction.GetValue(JsonConfig,"SSHKEY",verbus=False,ReturnValueForNone='')
-#TUNNEL_LIST = lib.BaseFunction.LoadJsonFile(JsonFile=TunnelDict,Verbus=False,ReternValueForFileNotFound={})
-#HIGHLY_RESTRICTED_NETWORKS = lib.BaseFunction.GetValue(TUNNEL_LIST,'Highly_Restricted_Networks',verbus=False,ReturnValueForNone={})
-#if TUNNEL_LIST == {}:
-#    RunAsSudo = False 
-#else:
-#    RunAsSudo = TUNNEL_LIST["RunAsSudo"]
-#    TUNNEL_LIST = TUNNEL_LIST["tunnel"]
 
-#TUNNEL_LIST = TUNNEL_LIST["tunnel"]
 
 ######################################################
 ######################################################
-
-_B = "[1m"
-_N = "[22m"
-_D = "[2m"
-_reset = "[0m"
-_UN = "\033[4m"
-_fw = "[37m"
-_fy = "[33m"
-_fb = "[34m"
-_fbl = "[30m"
-_fr = "[31m"
-_fc = "[36m"
-_fg = "[32m"
-_fm = "[35m"
-_fEx_w = "[97m"
-_fEx_y = "[93m"
-_fEx_b = "[94m"
-_fEx_bl = "[90m"
-_fEx_r = "[91m"
-_fEx_c = "[96m"
-_fEx_g = "[92m"
-_fEx_m = "[95m"
-
-
-_bw = "[47m"
-_by = "[43m"
-_bb = "[44m"
-_bbl = "[40m"
-_br = "[41m"
-_bc = "[46m"
-_bg = "[42m"
-_bm = "[45m"
-_brst = "[49m"
-_bEx_w = "[107m"
-_bEx_y = "[103m"
-_bEx_b = "[104m"
-_bEx_bl = "[100m"
-_bEx_r = "[101m"
-_bEx_c = "[106m"
-_bEx_g = "[102m"
-_bEx_m = "[105m"
 
 if os.path.exists(SSHKEY) == False:
     lib.BaseFunction.clearScreen()
@@ -168,10 +122,11 @@ def PrintServerLine(ServerDict,lenName,lenIP,lenTags,lenCode,LineNumber=0):
     else:    
         print(f"{_fw}{LineNumberStr} {Icon} {_ServerName} {_ServerIP} {_B}{_fy}{_ServerCode}{_reset} {_reset}")        
         
-def printServerInfo(ServerCode):
+def printServerInfo(ServerCode,PrintIt=True):
     try:
         if ServerCode == 'local':    
-            print(f"\n{_fw}Server Name : {_reset}{'🖥️   '}{_fEx_b}{'Localhost'}{_reset}")                       
+            if PrintIt:
+                print(f"\n{_fw}Server Name : {_reset}{'🖥️   '}{_fEx_b}{'Localhost'}{_reset}")                       
             _Dict = {}
             _Dict["ServerName"] = "Localhost"
             _Dict["IP"] = "localhost"
@@ -180,20 +135,21 @@ def printServerInfo(ServerCode):
     except:
         pass
     for _ in SERVER_LIST:
-        if _["Code"] == ServerCode:
-            if _['Icon'] != '':
-                Icon =  f'{_["Icon"]}  '
-            else:
-                Icon = ''  
-            print(f"\n{_fw}Server Name : {_reset}{Icon}{_fEx_b}{_['ServerName']}{_reset}")
-            print(f"{_fw}IP          : {_fy}{_['IP']}{_reset}")
-            print(f"{_fw}User        : {_fEx_b}{_['User']}{_reset}")
-            print(f"{_fw}Port        : {_fEx_b}{_['Port']}{_reset}")
-            print(f"{_fw}Group       : {_fEx_b}{_['Group']}{_reset}")
-            TagsStr = ''
-            for _t in _['Tags']:
-                TagsStr += f"{_fw}{_bb} {_t} {_reset} "
-            print(f"{_fw}Tags        : {TagsStr}{_reset}")
+        if _["Code"] == ServerCode:            
+            if PrintIt:
+                if _['Icon'] != '':
+                    Icon =  f'{_["Icon"]}  '
+                else:
+                    Icon = ''  
+                print(f"\n{_fw}Server Name : {_reset}{Icon}{_fEx_b}{_['ServerName']}{_reset}")
+                print(f"{_fw}IP          : {_fy}{_['IP']}{_reset}")
+                print(f"{_fw}User        : {_fEx_b}{_['User']}{_reset}")
+                print(f"{_fw}Port        : {_fEx_b}{_['Port']}{_reset}")
+                print(f"{_fw}Group       : {_fEx_b}{_['Group']}{_reset}")
+                TagsStr = ''
+                for _t in _['Tags']:
+                    TagsStr += f"{_fw}{_bb} {_t} {_reset} "
+                print(f"{_fw}Tags        : {TagsStr}{_reset}")
             return _
 
 
