@@ -109,7 +109,7 @@ def SearchCodeInParameterMode(UserInput):
         elif len(_SrvList) == 1:
             return _SrvList[0]
         else:
-            core.PrintServerList(_SrvList)            
+            core.PrintServerList(ServersList=_SrvList,highlight_text=UserInput)
             
             if UserInput.strip() in _SrvList:
                 _code = UserInput
