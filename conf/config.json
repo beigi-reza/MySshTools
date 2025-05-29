@@ -2,6 +2,6 @@
     "def_ssh_port": "22",
     "def_ssh_user": "root",
     "def_ssh_key": "",
-    "Tag_View": false,
+    "Tag_View": true,
     "SSHKEY": "/home/beigi/myApp/MySshTools/key/id_rsa"
 }

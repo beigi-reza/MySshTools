@@ -60,7 +60,7 @@ def MainMenu(msg=''):
             msg = ''        
         if _SrvList not in [None]:
             if len(_SrvList) > 0:
-                core.PrintServerList(_SrvList)
+                core.PrintServerList(ServersList=_SrvList,highlight_text=UserInput)
                 if UserInput != '':
                     if UserInput.strip() in _SrvList:
                             _CopdeFoundInServerlist = True                           
