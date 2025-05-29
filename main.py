@@ -81,8 +81,8 @@ def MainMenu(msg=''):
                     _SrvList = 'ALL'
             else:                
                 try:
-                    InputNumber = int(UserInput)
-                    if InputNumber < len(_SrvList):
+                    InputNumber = int(UserInput)                    
+                    if InputNumber <= len(_SrvList):
                         if len(_SrvList) < 10:
                             _x = 1 
                             for _ in _SrvList:
