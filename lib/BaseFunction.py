@@ -8,7 +8,6 @@
 
 import json
 from tabnanny import verbose
-from click import style
 from datetime import datetime
 import sys
 import os
