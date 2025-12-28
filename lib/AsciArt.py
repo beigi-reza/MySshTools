@@ -1,13 +1,10 @@
-#####################################################
-# Fn_CenterString
-# Update GetValue - 1403-09-03
-#from colorama import Fore, Back, Style
 import color.Back as Back
 import color.Fore as Fore
 import color.Style as Style
+import art
 
-
-def FnAlignmentStr(originalString: str, target_length: int, padding_char: str = " ",AlignmentMode = "center") -> str:
+ClockIconList = ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚']
+def Fn_CenterString(originalString: str, target_length: int, padding_char: str = " ",AlignmentMode = "center") -> str:
     """اضافه کردن و بزرگ کردن رشته دریافتی و برگشت آن به طول درخواستی
 
     Args:
@@ -98,6 +95,613 @@ def BorderIt(Text:str,BorderColor = '',TextColor = '', WidthBorder = 100):
         print(f'{ClmnChar} {TextColor}{line}{space_al}{ClmnChar}')
     print(Dwonline)
 
+def ArtText(Text = "",Font = "",color = Fore.WHITE,PrintIt = True):
+    FontList = ['straight',
+                'stop',
+                'standard',
+                'stampate',
+                'shimrod',
+                'santaclara',
+                'rounded',
+                'rectangles',
+                'rammstein',
+                'ogre',
+                ]
+    if Font == "":
+        Font = 'standard'
+    TText = art.text2art(text=Text,font=Font)        
+    if PrintIt:    
+        print(f'{color}{TText}{Style.RESET_ALL}')
+    else:
+        return TText
+    
+
+
+def TestFont(Text = '',color = Fore.WHITE):
+    FontList = ['straight',
+                'stop',
+                'standard',
+                'stampate',
+                'shimrod',
+                'santaclara',
+                'rounded',
+                'rectangles',
+                'rammstein',
+                'ogre',
+                'smisome1',
+                'cyberlarge',
+                'cybermedium',
+                'larry3d',
+                'merlin1',
+                ]
+    for Font in FontList:        
+        TText = art.text2art(text=Text,font=Font)
+        print("")
+        print(f'{color}{TText}{Style.RESET_ALL}')
+        print("")
+
+def GenerateBarGraph(length = 10,UsedPercent = 20,UseEmoji = True):
+    if isinstance(UsedPercent,str):
+        if UsedPercent.endswith('%'):
+            UsedPercent = UsedPercent[:-1]
+        try:
+            UsedPercent = float(UsedPercent)
+        except:
+            UsedPercent = 0
+
+    if UseEmoji:
+        if UsedPercent <= 30:
+            if length >= 10:
+                if UsedPercent < 10:
+                    #UsedPercent = 10
+                    Used_char = '🟦'
+                else:
+                    Used_char = '🟩'                        
+            else:    
+                Used_char = '🟩'
+        elif UsedPercent <=60:
+            Used_char = '🟨'
+        elif UsedPercent <= 80:
+            Used_char = '🟧'
+        else:
+            Used_char = '🟥'
+
+        Unused_char = '⬜'
+    else:
+        Used_char = '█'
+        Unused_char = '░'    
+    filled = int(length * UsedPercent / 100)
+    RamBar = Used_char * filled + Unused_char * (length - filled)
+    return RamBar
+
+
+def GetCountryNameFromCode(CountryCode:str = ''):
+    CountryDict = {
+        'RNX': {
+            'name':'🏢 Ronix Company 🏢',
+            'emoji':'🏁'
+        },
+        'Invalid': {
+            'name':'Invalid Country',
+            'emoji':'🏴'
+        },
+        'US': {
+            'name':'United States',
+            'emoji':'🇺🇸'
+        },
+        'IR': {
+            'name':'Iran',
+            'emoji':'🇮🇷'
+        },
+        'IN': {
+            'name':'India',
+            'emoji':'🇮🇳'
+        },
+        'CN': {
+            'name':'China',
+            'emoji':'🇨🇳'
+        },
+        'RU': {
+            'name':'Russia',
+            'emoji':'🇷🇺'
+        }, 
+        'DE': {
+            'name':'Germany',
+            'emoji':'🇩🇪'
+        },
+        'FR': {
+            'name':'France',
+            'emoji':'🇫🇷'
+        },
+        'GB': {
+            'name':'United Kingdom',
+            'emoji':'🇬🇧'
+        },
+        'JP': {
+            'name':'Japan',
+            'emoji':'🇯🇵'
+        },
+        'CA': {
+            'name':'Canada',
+            'emoji':'🇨🇦'
+        },
+        'UA': {
+            'name':'Ukraine',
+            'emoji':'🇺🇦'
+        },
+        'BD': {
+            'name':'Bangladesh',
+            'emoji':'🇧🇩'
+        },
+        'PK': {
+            'name':'Pakistan',
+            'emoji':'🇵🇰'
+        },
+        'NK': {
+            'name':'North Korea',
+            'emoji':'🇰🇵'
+        },
+        'NL': {
+            'name':'Netherlands',
+            'emoji':'🇳🇱'
+        },
+        'CY': {
+            'name':'Cyprus',
+            'emoji':'🇨🇾'
+        },
+        'IT': {
+            'name':'Italy',
+            'emoji':'🇮🇹'
+        },
+        'SG': {
+            'name':'Singapore',
+            'emoji':'🇸🇬'
+        },
+        'AU': {
+            'name':'Australia',
+            'emoji':'🇦🇺'
+        },
+        'GE': {
+            'name':'Georgia',
+            'emoji':'🇬🇪'
+        },
+        'ZA': {
+            'name':'South Africa',
+            'emoji':'🇿🇦'
+        },
+        'ID': {
+            'name':'Indonesia',
+            'emoji':'🇮🇩'
+        },
+        'TR': {
+            'name':'Turkey',
+            'emoji':'🇹🇷'
+        },
+        'IE': {
+            'name':'Ireland',
+            'emoji':'🇮🇪'
+        },
+        'KR': {
+            'name':'South Korea',
+            'emoji':'🇰🇷'
+        },
+        'MM': {
+            'name':'Myanmar',
+            'emoji':'🇲🇲'
+        },
+        'ES': {
+            'name':'Spain',
+            'emoji':'🇪🇸'
+        },
+        'PH': {
+            'name':'Philippines',
+            'emoji':'🇵🇭'
+        },
+        'SA': {
+            'name':'Saudi Arabia',
+            'emoji':'🇸🇦'
+        },
+        'OM': {
+            'name':'Oman',
+            'emoji':'🇴🇲'
+        },
+        'AE': {
+            'name':'United Arab Emirates',
+            'emoji':'🇦🇪'
+        },
+        'MU': {
+            'name':'Mauritius',
+            'emoji':'🇲🇺'
+        },
+        'QA': {
+            'name':'Qatar',
+            'emoji':'🇶🇦'
+        },
+        'HK': {
+            'name':'Hong Kong',
+            'emoji':'🇭🇰'
+        },
+        'MG': {
+            'name':'Madagascar',
+            'emoji':'🇲🇬'
+        },
+        'CH': {
+            'name':'Switzerland',
+            'emoji':'🇨🇭'
+        },
+        'KZ': {
+            'name':'Kazakhstan',
+            'emoji':'🇰🇿'
+        },
+        'LB': {
+            'name':'Lebanon',
+            'emoji':'🇱🇧'
+        },
+        'EG': {
+            'name':'Egypt',
+            'emoji':'🇪🇬'
+        },
+        'CL': {
+            'name':'Chile',
+            'emoji':'🇨🇱'
+        },
+        'LY': {
+            'name':'Libya',
+            'emoji':'🇱🇾'
+        },
+        'CG': {
+            'name':'Congo',
+            'emoji':'🇨🇬'
+        },
+        'BY': {
+            'name':'Belarus',
+            'emoji':'🇧🇾'
+        },
+        'LK': {
+            'name':'Sri Lanka',
+            'emoji':'🇱🇰'
+        },
+        'BR': {
+            'name':'Brazil',
+            'emoji':'🇧🇷'
+        },
+        'RS': {
+            'name':'Serbia',
+            'emoji':'🇷🇸'
+        },
+        'IQ': {
+            'name':'Iraq',
+            'emoji':'🇮🇶'
+        },
+        'JQ': {
+            'name':'Jordan',
+            'emoji':'🇯🇴'
+        },
+        'PT': {
+            'name':'Portugal',
+            'emoji':'🇵🇹'
+        },
+        'TH': {
+            'name':'Thailand',
+            'emoji':'🇹🇭'
+        },
+        'AZ': {
+            'name':'Azerbaijan',
+            'emoji':'🇦🇿'
+        },
+        'CZ': {
+            'name':'Czech Republic',
+            'emoji':'🇨🇿'
+        },
+        'PL': {
+            'name':'Poland',
+            'emoji':'🇵🇱'
+        },
+        'SE': {
+            'name':'Sweden',
+            'emoji':'🇸🇪'
+        },
+        'NO': {
+            'name':'Norway',
+            'emoji':'🇳🇴'
+        },
+        'FI': {
+            'name':'Finland',
+            'emoji':'🇫🇮'
+        },
+        'DK': {
+            'name':'Denmark',
+            'emoji':'🇩🇰'
+        },
+        'GR': {
+            'name':'Greece',
+            'emoji':'🇬🇷'
+        },
+        'HU': {
+            'name':'Hungary',
+            'emoji':'🇭🇺'
+        },
+        'RO': {
+            'name':'Romania',
+            'emoji':'🇷🇴'
+        },
+        'BG': {
+            'name':'Bulgaria',
+            'emoji':'🇧🇬'
+        },
+        'HR': {
+            'name':'Croatia',
+            'emoji':'🇭🇷'
+        },
+        'SK': {
+            'name':'Slovakia',
+            'emoji':'🇸🇰'
+        },
+        'SI': {
+            'name':'Slovenia',
+            'emoji':'🇸🇮'
+        },
+        'LT': {
+            'name':'Lithuania',
+            'emoji':'🇱🇹'
+        },
+        'LV': {
+            'name':'Latvia',
+            'emoji':'🇱🇻'
+        },
+        'EE': {
+            'name':'Estonia',
+            'emoji':'🇪🇪'
+        },
+        'VN': {
+            'name':'Vietnam',
+            'emoji':'🇻🇳'
+        },
+        'AM': {
+            'name':'Armenia',
+            'emoji':'🇦🇲'
+        },
+        'TN': {
+            'name':'Tunisia',
+            'emoji':'🇹🇳'
+        },
+        'DZ': {
+            'name':'Algeria',
+            'emoji':'🇩🇿'
+        },
+        'MA': {
+            'name':'Morocco',
+            'emoji':'🇲🇦'
+        },
+        'GH': {
+            'name':'Ghana',
+            'emoji':'🇬🇭'
+        },
+        'KE': {
+            'name':'Kenya',
+            'emoji':'🇰🇪'
+        },
+        'NG': {
+            'name':'Nigeria',
+            'emoji':'🇳🇬'
+        },
+        'TZ': {
+            'name':'Tanzania',
+            'emoji':'🇹🇿'
+        },
+        'UG': {
+            'name':'Uganda',
+            'emoji':'🇺🇬'
+        },
+        'SN': {
+            'name':'Senegal',
+            'emoji':'🇸🇳'
+        },
+        'CI': {
+            'name':'Côte d’Ivoire',
+            'emoji':'🇨🇮'
+        },
+        'CM': {
+            'name':'Cameroon',
+            'emoji':'🇨🇲'
+        },
+        'ZW': {
+            'name':'Zimbabwe',
+            'emoji':'🇿🇼'
+        },
+        'NZ': {
+            'name':'New Zealand',
+            'emoji':'🇳🇿'
+        },
+        'MX': {
+            'name':'Mexico',
+            'emoji':'🇲🇽'
+        },
+        'AR': {
+            'name':'Argentina',
+            'emoji':'🇦🇷'
+        },
+        'CO': {
+            'name':'Colombia',
+            'emoji':'🇨🇴'
+        },
+        'PE': {
+            'name':'Peru',
+            'emoji':'🇵🇪'
+        },
+        'VE': {
+            'name':'Venezuela',
+            'emoji':'🇻🇪'
+        },
+        'EC': {
+            'name':'Ecuador',
+            'emoji':'🇪🇨'
+        },
+        'UY': {
+            'name':'Uruguay',
+            'emoji':'🇺🇾'
+        },
+        'PY': {
+            'name':'Paraguay',
+            'emoji':'🇵🇾'
+        },
+        'BO': {
+            'name':'Bolivia',
+            'emoji':'🇧🇴'
+        },
+        'XK': {
+            'name':'Kosovo',
+            'emoji':'🇽🇰'
+        },
+        'ET': {
+            'name':'Ethiopia',
+            'emoji':'🇪🇹'
+        },
+        'SD': {
+            'name':'Sudan',
+            'emoji':'🇸🇩'
+        },
+        'ML': {
+            'name':'Mali',
+            'emoji':'🇲🇱'
+        },
+        'BF': {
+            'name':'Burkina Faso',
+            'emoji':'🇧🇫'
+        },
+        'NE': {
+            'name':'Niger',
+            'emoji':'🇳🇪'
+        },
+        'TD': {
+            'name':'Chad',
+            'emoji':'🇹🇩'
+        },
+        'RW': {
+            'name':'Rwanda',
+            'emoji':'🇷🇼'
+        },
+        'BI': {
+            'name':'Burundi',
+            'emoji':'🇧🇮'
+        },
+        'MW': {
+            'name':'Malawi',
+            'emoji':'🇲🇼'
+        },
+        'LS': {
+            'name':'Lesotho',
+            'emoji':'🇱🇸'
+        },
+        'SZ': {
+            'name':'Eswatini',
+            'emoji':'🇸🇿'
+        },
+        'AO': {
+            'name':'Angola',
+            'emoji':'🇦🇴'
+        },
+        'CM': {
+            'name':'Cameroon',
+            'emoji':'🇨🇲'
+        },
+        'GA': {
+            'name':'Gabon',
+            'emoji':'🇬🇦'
+        },
+        'CG': {
+            'name':'Congo',
+            'emoji':'🇨🇬'
+        },
+        'CD': {
+            'name':'Democratic Republic of the Congo',
+            'emoji':'🇨🇩'
+        },
+        'BJ': {
+            'name':'Benin',
+            'emoji':'🇧🇯'
+        },
+        'TG': {
+            'name':'Togo',
+            'emoji':'🇹🇬'
+        },
+        'CV': {
+            'name':'Cape Verde',
+            'emoji':'🇨🇻'
+        },
+        'GM': {
+            'name':'Gambia',
+            'emoji':'🇬🇲'
+        },
+        'SL': {
+            'name':'Sierra Leone',
+            'emoji':'🇸🇱'
+        },
+        'LR': {
+            'name':'Liberia',
+            'emoji':'🇱🇷'
+        },
+        'GW': {
+            'name':'Guinea-Bissau',
+            'emoji':'🇬🇼'
+        },
+        'ST': {
+            'name':'São Tomé and Príncipe',
+            'emoji':'🇸🇹'
+        },
+        'CV': {
+            'name':'Cape Verde',
+            'emoji':'🇨🇻'
+        },
+        'UZ': {
+            'name':'Uzbekistan',
+            'emoji':'🇺🇿'
+        },
+        'MK': {
+            'name':'North Macedonia',
+            'emoji':'🇲🇰'
+        },
+        'AL': {
+            'name':'Albania',
+            'emoji':'🇦🇱'
+        },
+        'MT': {
+            'name':'Malta',
+            'emoji':'🇲🇹'
+        },
+        'IS': {
+            'name':'Iceland',
+            'emoji':'🇮🇸'
+        },
+        'LV': {
+            'name':'Latvia',
+            'emoji':'🇱🇻'
+        },
+        'PR': {
+            'name':'Puerto Rico',
+            'emoji':'🇵🇷'
+        },
+        'MN': {
+            'name':'Mongolia',
+            'emoji':'🇲🇳'
+        },
+        'MY': {
+            'name':'Malaysia',
+            'emoji':'🇲🇾'
+        },
+        'JQ': {
+            'name':'Jordan',
+            'emoji':'🇯🇴'
+        },
+        'MV': {
+            'name':'Maldives',
+            'emoji':'🇲🇻'
+        },
+    }
+    for code, info in CountryDict.items():
+        if code == CountryCode:
+            return info['name'], info['emoji']
+    return 'Unknown', '🏳️'
 
 
 if __name__ == "__main__":    

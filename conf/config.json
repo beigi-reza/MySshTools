@@ -3,5 +3,6 @@
     "def_ssh_user": "root",
     "def_ssh_key": "",
     "Tag_View": true,
-    "SSHKEY": "/home/beigi/myApp/MySshTools/key/id_rsa"
+    "SSHKEY": "/opt/MySshTools/key/id_rsa",
+    "log_path": "/var/log"
 }

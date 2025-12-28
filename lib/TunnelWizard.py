@@ -215,8 +215,9 @@ def CkeckNewMonitorPort(NewPort = None,TUNNEL_LIST = None):
         return True
     else:
         for tunnel in TUNNEL_LIST:
-            if tunnel["Highly_Restricted_Networks"].get('Enable',False):
-                MonitorPort = tunnel["Highly_Restricted_Networks"].get('MonitorPort',0)
+            TunnelDict = TUNNEL_LIST[tunnel]
+            if TunnelDict["Highly_Restricted_Networks"].get('Enable',False):
+                MonitorPort = TunnelDict["Highly_Restricted_Networks"].get('MonitorPort',0)
                 if MonitorPort != 0:
                     if NewPort == MonitorPort:
                         return False
@@ -413,8 +414,8 @@ def CreateTunnle(Mode = None,Msg = '',TUNNEL_LIST = []):
             if _Code.strip() == '':
                 continue
             _Code = _Code[0:3]
-            for TUNNEL in TUNNEL_LIST:
-                if _Code.lower() == TUNNEL['Code'].lower():
+            for _t in TUNNEL_LIST:                
+                if _Code.lower() == TUNNEL_LIST[_t]['Code'].lower():
                     Msg = f'Tunnel Code is already in use, Please enter a unique Tunnel Code.'
                     _Code = ''
                     break

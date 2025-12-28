@@ -31,6 +31,15 @@ def clearScreen():
     else:
         _ = system('clear')
 
+def LoadJsonFromText(JsonText:str,Verbus = True,ReternValueForFileNotFound = None):
+    try:      
+      js  = JsonText.replace('\n', '')       
+      return json.loads(js)
+    except Exception as e:
+        if Verbus:
+            print(Style.BRIGHT + Fore.RED + "Error Load Json From Text " + Style.RESET_ALL)            
+            print(Style.BRIGHT + Fore.RED + str(e) + Style.RESET_ALL)            
+        return ReternValueForFileNotFound
 
 ## Load Json File and return it as Dictionary
 def LoadJsonFile(JsonFile,Verbus = True,ReternValueForFileNotFound = None): 
@@ -43,12 +52,28 @@ def LoadJsonFile(JsonFile,Verbus = True,ReternValueForFileNotFound = None):
         else:
             return ReternValueForFileNotFound
           
-            
-    js = JsFile.read()
-    js  = js.replace('\n', '') 
-    global JsonConfig   
-    return json.loads(js)
+          
+    try:
+      js = JsFile.read()
+      js  = js.replace('\n', '') 
+      global JsonConfig
+      return json.loads(js)
+    except Exception as e:
+        if Verbus:
+            print(Style.BRIGHT + Fore.RED + "Error Load Json File [ " + Fore.WHITE + JsonFile + Fore.RED + " ] " + Style.RESET_ALL)            
+            print(Style.BRIGHT + Fore.RED + str(e) + Style.RESET_ALL)            
+        return ReternValueForFileNotFound
 
+def SaveJsonFile(JsonFile,JsonData,Verbus = True):
+    try:
+        with open(JsonFile, 'w') as f:
+            json.dump(JsonData, f, indent=4)
+        return True, ''
+    except Exception as e:
+        if Verbus:
+            print(Style.BRIGHT + Fore.RED + "Error Save Json File [ " + Fore.WHITE + JsonFile + Fore.RED + " ] " + Style.RESET_ALL)            
+            print(Style.BRIGHT + Fore.RED + str(e) + Style.RESET_ALL)            
+        return False, str(e)
 
 def FnCreateDirectory(your_directory:str,Verbus = True):
   try:
@@ -171,7 +196,7 @@ def GetValue(InputDict:dict,*Key,verbus = True,ReturnValueForNone = None,Termina
       for _ in Key:
         Rst = Rst + f'["{_}"]'
       #print(Style.BRIGHT + Back.RED+ Fore.WHITE + "Value (({})) Not Found / GetValue Function in BaseFunction.py".format(Rst) + Style.RESET_ALL)
-      print(f'{_B}{_w}Value  {_r}{Rst}{_w}   Not Found . {_reset}/ GetValue Function in BaseFunction.py')
+      print(f'{_B}{_fw}Value  {_fr}{Rst}{_fw}   Not Found . {_reset}/ GetValue Function in BaseFunction.py')
       input(Style.BRIGHT + Fore.WHITE + "Press Any Key to ... ")      
       if TerminateApp:
         FnExit()

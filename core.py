@@ -1,4 +1,3 @@
-from sympy import true
 import lib.BaseFunction
 import lib.Logo
 import lib.AsciArt

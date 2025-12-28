@@ -5,9 +5,7 @@ import tunnel as tu
 import concurrent.futures
 from datetime import datetime, timedelta
 import os
-from tunnel import ( 
-    TUNNEL_LIST 
-)
+from tunnel import TUNNEL_LIST
 from core import (
     current_directory
 )
@@ -33,7 +31,8 @@ from core import (
 
 def KeepAliveList():
     _tunnel = []
-    for tunnel in TUNNEL_LIST:
+    for _t in TUNNEL_LIST:
+        tunnel = TUNNEL_LIST[_t]
         if tunnel.get('Keep_Alive',False):
             _tunnel.append(tunnel)
     return _tunnel
@@ -53,6 +52,7 @@ def FnStartTthread(KeepAliveTunnelList):
 
 
 if __name__ == "__main__":    
+    #logpath = '/tmp/keep-alive-logs'
     logpath  = os.path.join(current_directory,'logs')
     if os.path.exists(logpath) == False:
         _log = f'Logs Folder not found [ {logpath} ]'

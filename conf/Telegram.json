@@ -1,0 +1,53 @@
+{
+    "bot_token" : "8513500964:AAGj6aYjRBCoc44rwjtgsXcI-vdVZtpbvM8",
+    "primession" : {
+        "standard_report" : [""],
+        "advanced_report" : [""],
+        "admin": ["106125197"]
+    },
+    "stickers":{
+        "warning":[
+            "",
+            ""
+        ],
+        "critical":[
+            "",
+            ""
+        ],
+        "ssh-tunnel-boss":          ["CAACAgQAAxkBAAEP9Z1pNoU8rXevrViljqjuewnyH3k_rgACSRoAAuk9uFFUAYrgd5tPcTYE"],
+        "ssh_tunnel_details":       ["CAACAgQAAxkBAAEP91VpOANJxEavzeQy4HNKAAGIgQOzv5EAAoMbAAIYT8FRV6j9eJ5yayM2BA"],
+        "ssh_tunnel_delete":        ["CAACAgQAAxkBAAEP-UppOTFsEccW-sCoh9x6cTn8Xa693AAC4xoAAgEu0FFAPlubOlShqTYE"],
+        "tunnel_not_found":         ["CAACAgQAAxkBAAEP-VJpOTPu_BchG_fLAdiF-8iRfk0LUwACzxsAAshDyFFCnOJvWvCYHDYE"],
+        "change_authentication":    ["CAACAgQAAxkBAAEP_eRpPSz1gBsqiV4c6rzwkan-fmv4XAAC-B0AAng76VFDgZO4fExynjYE"],
+        "change_tunnel_type":       ["CAACAgQAAxkBAAEP_2ppPpKFEEqVIYwMu6c-63vzKwKeDQAC4yAAAle3-FGyz3ACMB2urDYE",
+                                    "CAACAgQAAxkBAAEP_2xpPpKGTkU0U797Iny2U8pHft_1gAACZh0AAtAq8VGQS4IS4F5FFTYE",
+                                    "CAACAgQAAxkBAAEP_25pPpKI4vfG-cwhPvxJxNkgH_7y7AAC6h0AAvKd8FFLX7gCFKs3_jYE"],
+        "change_ssh_config":        ["CAACAgQAAxkBAAEP_9FpPrd74kyh48TTps1JOvbdKLEFqwACFxkAArLu-VGFDEfieiUp7zYE",
+                                    "CAACAgQAAxkBAAEP_9NpPrd9nrYVRwic-EZxN-TuDJbnCwACWB8AAlZc8VGV3iLtGXrvtzYE"
+                        ],
+        "change_Source_config":     ["CAACAgQAAxkBAAEQAaFpP8cg1hdR29jXGqgKAaqIquOHRAACaR0AAnZXAAFSlPwSRfyEscA2BA",
+                                    "CAACAgQAAxkBAAEQAaNpP8ckU-GHa_y3dLM2TCVuRkJEOAAC4BgAAl3PAAFSZwyVqia34fE2BA"],
+        "change_FinalPort_config":  ["CAACAgQAAxkBAAEQAaVpP8eBwGwMutR6K7j13isQq0w0NAACTBwAApg9AAFSfSXXMPbBTLQ2BA",
+                                    "CAACAgQAAxkBAAEQAadpP8eDxcPqvdxDNgfVjjB30vLhugACSRsAAsfaAAFSBreDxFeBLm82BA"],
+        "advanced_config":          ["CAACAgQAAxkBAAEQAdhpP-buPmVslRrc2VA0_HHPpqqiSAACmR8AAn36AVLFN_u2lD8PcjYE",
+                                    "CAACAgQAAxkBAAEQAdppP-bxi7NQpgJqllJ8LRIkSZ7PcAACSyAAAuYnAVL2zNy2BQkdljYE",    
+                                    "CAACAgQAAxkBAAEQAdxpP-bzJvEaJi4cBaOgPW_kzBPueAACixwAAmIRAAFSpU8f9fvNXqQ2BA",
+                                    "CAACAgQAAxkBAAEQAfBpP-gBiMhT97zDvfZRMDpGuOfRugAC2yEAAunmAVLp2q2j69r-xjYE"],
+        "ServerAliveInterval":      ["CAACAgQAAxkBAAEQA9ZpQURyVwzQ4eRd130Kke4h6bqTSgACWR0AAiK9CFKBWS5jo6s_6TYE"],
+        "ServerAliveCountMax":      ["CAACAgQAAxkBAAEQBA9pQVgtMV7I_P3FTHt_zxdG38JFGQACxBwAAk_TCFLVXhHXuyFn4DYE"],
+        "Keep_Alive_Service":       ["CAACAgQAAxkBAAEQBbVpQloAAUacGazSc7TYS_xuuTWPPpYAArobAAKBphlSdK69bWFnSsM2BA",
+                                    "CAACAgQAAxkBAAEQBbZpQloBFWWfP8Qa7cFwxYSUrTHCUwACKB0AAg1YGFKoeT_vcKcktzYE"],
+        "MonitorPort":              ["CAACAgQAAxkBAAEQBcZpQmkiWaSTLSioPTvguXCcqoqNqQACIRoAAvjqEVJE_8itO-meTTYE"
+                                    ,"CAACAgQAAxkBAAEQBcdpQmkjVOEVNrGobqbpyzs6fxs9PQACURsAAhjvEFJgT7Ucpne7EzYE"],
+        "Edit_tunnel":              ["CAACAgQAAxkBAAEQBc9pQmz7BEPrkunSmvmFwFPKAAFq4AIAAiEcAAIfahlSjUK2I2QDbj82BA",
+                                    "CAACAgQAAxkBAAEQBdFpQmz8RpJ4VRr4sl1XnUhBo8LC5gACmRwAAo_kGVIV3bni7verSTYE"],
+        "Save_changes":             ["CAACAgQAAxkBAAEQBnVpQq0_MOT5wLFeyxFmuwABEkHj4IUAAgMkAAJFvxlSO6XREuqljGc2BA"],
+        "SSH_Tunnel_Start":         ["CAACAgQAAxkBAAEQC4JpRk3555v3GtV9pVtIxLkDF_6uTgAC8xsAAk2tMVJVcTW10ylapjYE"],   
+        "SSH_Tunnel_Stop":          ["CAACAgQAAxkBAAEQC4RpRk38bFqsRLZObAu6v8hT_I0QWQAC6BsAAqg6MVI6PZEVy5wFSTYE"],
+        "SSH_Tunnel_Clone":         ["CAACAgQAAxkBAAEQEHBpSSeR9r7JqoTfhbM0DbMmBaaCzwACfRoAAtj0SFJ5FBEbVgABN8U2BA"],
+        "SSH_Tunnel_Disabled":      ["CAACAgQAAxkBAAEQEIJpSS28lwABIkEh6oPlTRMMEglQlgsAAkIfAAJzp0lSAx5RgWD-elU2BA"],
+        "SSH_Create_New_Tunnel":    ["CAACAgQAAxkBAAEQEpBpSoVAC42KdDbeOzQr8ynnnBzEZAACMSIAAsOnUFK0K0i7_O1U4zYE"],
+        "SSH_debug_Tunnel":         ["CAACAgQAAxkBAAEQG3FpT7gmw0MItdqESoN4LOP3QRuX5wACmBkAAvkheVKg-Rmxek-KiDYE"]   
+
+    }
+}

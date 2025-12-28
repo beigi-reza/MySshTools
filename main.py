@@ -11,7 +11,7 @@ import core
 import sys
 import tunnel
 import json
-from tunnel import TunnelJsonFilePath,TUNNEL_Json,TUNNEL_LIST
+from tunnel import TunnelJsonFilePath,TUNNEL_LIST
 from core import current_directory,JsonListFile,ServerConfigFile,SERVER_LIST,SSHKEY
 from color.Style import _B,_D,_N,_reset
 from color.Back import _bw,_by,_bb,_bbl,_br,_bc,_bg,_bm,_brst,_bEx_w,_bEx_y,_bEx_b,_bEx_bl,_bEx_r ,_bEx_c ,_bEx_g ,_bEx_m ,_b_rest
@@ -215,9 +215,9 @@ def StartSshTunnel(TunnelType,ServerDict):
 
 
 def SaveTunnel(TunnelDict,msg = ''):
-        TUNNEL_LIST.append(TunnelDict)
+        ggggg.append(TunnelDict)
         TunnelJson = {
-            "tunnel" : TUNNEL_LIST
+            "tunnel" : ggggg
         }
         TunnelCode = ''
         TunnelName = ''
@@ -250,7 +250,7 @@ def SaveTunnel(TunnelDict,msg = ''):
                 TunnelCode = input(f' \n{_B}{_fw}Enter Code for Tunnel > {_reset}')
                 if TunnelCode.strip() == '':
                     continue
-                for _ in TUNNEL_LIST:
+                for _ in ggggg:
                     if _['Code'].lower().strip() == TunnelCode.strip().lower():
                             msg = 'Tunnel Code Already Exist'                        
                             TunnelCode = ''
