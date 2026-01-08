@@ -89,16 +89,13 @@ def GenerateTunnelStatusSummary(TunnelCode='',UserData={}):
     _LServer = TunnelDict.get('Source_Server','')
     _LPort = TunnelDict.get('Source_port','N/A')
     _FinalPort = TunnelDict.get('FinalPort','N/A')
-
-    if TunnelDict.get('status',None) is None:
-        _statusStr = "⁉️ Status: Unknown ⁉️"
-        _FinalStr = f'N/A'
-    elif TunnelDict.get('status',False) is True:
-        _statusStr = f"Status: ▶️ Running ( PID {TunnelDict.get('pid','N/A')})"
-        _FinalStr = f'Final Adress: {_FinalIP}:{_FinalPort}'
-    else:   
+    rst = TunnelManagment.CheckStatusTunnel(TunnelDict)
+    if rst[0] is False:
         _statusStr = "Status: ⏹️ Stopped"
         _FinalStr = f'Final Port: {_FinalPort}'
+    else:        
+        _statusStr = f"Status: ▶️ Running ( PID {rst[2]})"
+        _FinalStr = f'Final Adress: {_FinalIP}:{_FinalPort}'
 
     if TunnelDict["Highly_Restricted_Networks"].get('Enable',False):
         _Mode = f'✨ Highly Restricted Networks'
@@ -290,7 +287,7 @@ def StopTunnelByCode(TunnelCode=''):
         TunnelCodeInList = _tunnel.get('Code','')
         if TunnelCodeInList.strip().lower() == TunnelCode.strip().lower():
             StatusTunnel = TunnelManagment.CheckStatusTunnel(_tunnel)
-            rst = TunnelManagment.KillProcessByPID(StatusTunnel[1])
+            rst = TunnelManagment.KillProcessByPID(StatusTunnel[2])
             break
     if rst[0]:
         return True, f"✅ Tunnel '{_tunnel.get('Name','Unknown')}' Stop successfully."

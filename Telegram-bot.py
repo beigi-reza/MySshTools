@@ -6,8 +6,6 @@ python-telegram-bot >= 20.x (async)
 import re
 import copy
 import os
-import io
-import asyncio
 from PIL import Image
 import lib.BaseFunction as base
 import logging
@@ -16,6 +14,7 @@ import TelegramBotFunction as BotFunc
 import lib.Edit_or_Create as EditCreateFunc
 from tunnel import RefreshTunnelList,DropAllSShTunnel,StartAllTunnel,SSHKEYDir,GetTunnelLogDetails,ClearTunnleLog
 from pathlib import Path
+import lib.ServiceManagmentHandler as SVM_HandlerFunc
 from telegram import (
     Update,
     InlineKeyboardButton,
@@ -60,12 +59,15 @@ log = logging.getLogger(__name__)
 
 def main_menu():   
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("📡 SSh Tunnel Managment", callback_data="tunnel_list")],
-        [InlineKeyboardButton("⚠️ Server with warning", callback_data="btn_onissue")],        
-        [InlineKeyboardButton("⚙️ Settings", callback_data="btn_setting")],
+        [InlineKeyboardButton("🦑 SSh Tunnel Managment", callback_data="tunnel_list")],
+        [InlineKeyboardButton("🦡 Service Managment", callback_data="SVM.MainMenu")],
         #[InlineKeyboardButton("Ask Value", callback_data="ask_value")],        
     ])
     
+
+        
+    
+
 def DynamicTunnelMenu(Backmenu=True,OnlyCreateNew=False):
     Menulist = []
     
@@ -285,7 +287,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if await has_permission(context=context,user_id=userId) is False:
             return
         await update.message.reply_text(
-            "🎉 **Welcom To Reporter Robots**\n\n"
+            "🦄 **Welcom To SSH Tunnel Managment**\n\n"
             "Select one of the menu options:",
             reply_markup=main_menu(),
             parse_mode="Markdown"
@@ -439,10 +441,6 @@ async def Fn_TunnelDetailsMsg(TunnelCode='',context=None,update=None,query=None,
     await context.bot.send_sticker(
         chat_id=UserId,
         sticker=StikerID)
-    #await context.bot.send_message(
-    #    chat_id=update.effective_chat.id,
-    #    text=Msg)
-    
     await query.message.reply_text(
                         Msg,
                         reply_markup=TunnelActionMeny(TunnelDict=TunnelDict,_from="Details"),
@@ -811,9 +809,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Fn_TunnelDetailsMsg(context=context,update=update,query=query,TunnelCode=tunnelCode,UserId=UserId)
     elif data.split('|')[0] ==  "StopAllTunnels":
         ######### STOP ALL TUNNELS ##############
-        rst = DropAllSShTunnel()
-        if len(rst) > 0:
-            for line in rst:
+        rstDict = DropAllSShTunnel(ReturnResualt=True)
+        if len(rstDict) > 0:
+            for _l in rstDict:
+                line = rstDict[_l].get('msg','')
                 await context.bot.send_message(
                     chat_id=UserId,
                     text=line
@@ -826,9 +825,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Fn_TunnelList(update, context,backmenu=True)            
     elif data.split('|')[0] ==  "StartAllTunnels":
         ######### STOP ALL TUNNELS ##############
-        rst = StartAllTunnel(ReturnResualt=True)
-        if len(rst) > 0:
-            for line in rst:
+        rstDic = StartAllTunnel(ReturnResualt=True)        
+        if len(rstDic) > 0:
+            for _m in rstDic:
+                line = rstDic[_m].get('msg','')
                 await context.bot.send_message(
                     chat_id=UserId,
                     text=line
@@ -1181,6 +1181,14 @@ async def document_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     #ConversationHandler.END
 
+# ===============================================
+#               SVM SVM TSVM SVM HANDLERS
+# ===============================================
+
+
+
+
+
 
 # ===============================================
 #               END HANDLERS
@@ -1197,6 +1205,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", helpmenu))    
     app.add_handler(CommandHandler("tunnels", Fn_TunnelList))    
+    app.add_handler(CallbackQueryHandler(SVM_HandlerFunc.SVM_handler,pattern=r"^SVM\."))
     app.add_handler(CallbackQueryHandler(button_handler))    
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     app.add_handler(MessageHandler(filters.Document.ALL, document_handler))

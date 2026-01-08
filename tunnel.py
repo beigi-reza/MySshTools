@@ -374,10 +374,10 @@ def ViewTunnleStatus(TunnelDict,OnNewSession=True,ReturnDictResualt=False):
             Msg = ''            
         if rst[0]:
             print(f'\nTunnel is : {_fw}{_bg} READY {_reset}')
-            print(f"\nTunnel {_fb}{TunnelDict['Name']}{_fw} is running with PID : {_by}{_fbl} {rst[1]} {_reset}")
+            print(f"\nTunnel {_fb}{TunnelDict['Name']}{_fw} is running with PID : {_by}{_fbl} {rst[2]} {_reset}")
             ResualtDict["pid"] = rst[1]
             ResualtDict["isActive"] = True
-            details = GetProcessDetails(rst[1])
+            details = GetProcessDetails(rst[2])
         else:
             print(f'\nTunnel is : {_fw}{_bb} STOP {_reset}')
             print(f"\nTunnel {_fw}{TunnelDict['Name']}{_fw} is not running.{_reset}")            
@@ -490,7 +490,7 @@ def ViewTunnleStatus(TunnelDict,OnNewSession=True,ReturnDictResualt=False):
                 lib.BaseFunction.FnExit()                                
             elif UserInput.lower().strip() == 's':
                 if rst[0]:
-                    KillProcessByPID(rst[1])
+                    KillProcessByPID(rst[2])
                 else:    
                     _rst = FnStartTunnel(TunnelDict,StartNewSession=OnNewSession)
                     if _rst[0] is False:
@@ -509,23 +509,29 @@ def ViewTunnleStatus(TunnelDict,OnNewSession=True,ReturnDictResualt=False):
 def StartAllTunnel(ReturnResualt=False):
     TUNNEL_LIST = RefreshTunnelList()
     MsgList = []    
-    RstList = []
+    RstDict = {}
     for _ in TUNNEL_LIST:
-        _tunnel = TUNNEL_LIST[_]
-        if CheckStatusTunnel(_tunnel)[0]:            
+        _tunnel = TUNNEL_LIST[_]        
+        CheckSts = CheckStatusTunnel(_tunnel)
+        RstDict[_tunnel['Code']] = {}
+        RstDict[_tunnel['Code']]['status'] = CheckSts[0]
+        RstDict[_tunnel['Code']]['pid'] = CheckSts[2]
+        if CheckSts[0]:
             Msg = f"❕ Tunnel {_tunnel['Name']} is already running."
             print(Msg)
-            RstList.append(Msg)            
+            RstDict[_tunnel['Code']]['msg'] = Msg
         else:
             _Rst = FnStartTunnel(_tunnel)
             if _Rst[0] is False:
-                msg = f"Tunnel {_tunnel['Name']} is not started >> {_Rst[1]}"
+                msg = f"❌ Tunnel {_tunnel['Name']} not started ❌\n\nlogs :\n{'-'*10} {_Rst[1]}\n{'-'*10}"
             else:
                 msg = f"▶️ Tunnel {_tunnel['Name']} Started Successfully."
             MsgList.append(msg)
-            RstList.append(msg)
+            RstDict[_tunnel['Code']]['pid'] = _Rst[2]
+            RstDict[_tunnel['Code']]['msg'] = msg
+
     if ReturnResualt:
-        return RstList
+        return RstDict
     
     if MsgList != []:        
         for _tunnel in MsgList:
@@ -533,18 +539,27 @@ def StartAllTunnel(ReturnResualt=False):
         print()
         lib.BaseFunction.PressEnterToContinue()    
 
-def DropAllSShTunnel(ReturnResualt=False):
-    TUNNEL_LIST = RefreshTunnelList()
-    rstList = []
-    for _ in TUNNEL_LIST:
-        _tunnel = TUNNEL_LIST[_]
+def DropAllSShTunnel(ReturnResualt=False):    
+    _TUNNEL_LIST = RefreshTunnelList()
+    rstDict = {}
+    for _ in _TUNNEL_LIST:
+        _tunnel = _TUNNEL_LIST[_]        
+        Name = _tunnel['Name']
         _RST = CheckStatusTunnel(_tunnel)
+        rstDict[_tunnel['Code']] = {}
         if _RST[0]:
-            KillProcessByPID(_RST[1])
+            KillProcessByPID(_RST[2])
             msg = f"⏹️ Tunnel {_tunnel['Name']} Stopped Successfully."
-            print(msg)
-            rstList.append(msg)
-    return rstList
+            print(msg)            
+            rstDict[_tunnel['Code']]['stoped'] = True
+            rstDict[_tunnel['Code']]['pid'] = _RST[2]
+            rstDict[_tunnel['Code']]['msg'] = msg
+        else:
+            rstDict[_tunnel['Code']]['stoped'] = False
+            rstDict[_tunnel['Code']]['pid'] = -1
+            rstDict[_tunnel['Code']]['msg'] = f'❕ Tunnel (( {Name} )) not Running.'
+            
+    return rstDict
             
 def KillProcessByPID(pid,Verbus=False):
     try:        
@@ -572,10 +587,77 @@ def KillProcessByPID(pid,Verbus=False):
             print(errrmsg)
         return False
 
+def GetTunnelStatusByDict(_TunnelDict):
+    _Title = f"{_TunnelDict['Name']}"
+    _Code = f"{_TunnelDict['Code']}"        
+    _LServer = _TunnelDict.get("Source_Server","localhost")
+    _LPort = _TunnelDict.get("Source_port",None)
+    _SourceOrRemote = f"{_LServer}:{_LPort}"
+    _sshPort = _TunnelDict.get("ssh_port",22)
+    _sshIp = _TunnelDict.get("ssh_ip",None)
+    _sshUser = _TunnelDict.get("ssh_user","root")
+    _SshServer = f"{_sshUser}@{_sshIp}:{_sshPort}"
+    _Type = _TunnelDict.get("Type","").upper()        
+    _authentication = _TunnelDict.get("authentication","")
+    if  _authentication.lower() == '':
+        _authentication = f'Defualt'
+    if _Type == "LOCAL":            
+        _FinalIP = lib.BaseFunction.GetLocalIP()        
+    elif _Type == "REMOTE":            
+        _FinalIP = f'{_TunnelDict["ssh_ip"]}'
+    elif _Type == "DYNAMIC":            
+        _FinalIP = f'{_TunnelDict["ssh_ip"]}'
+    else:            
+        _FinalIP = ''
+    _rst = CheckStatusTunnel(_TunnelDict)
+    _pid = ''
+    if _rst[0]:            
+        _status = True
+        _Final_adress = f'{_FinalIP}:{_TunnelDict["FinalPort"]}'
+        _pid = _rst[2]
+    else:            
+        _status = False
+        _Final_adress = f'{_TunnelDict["FinalPort"]}'
+    
+    if _TunnelDict.get('Keep_Alive',False):
+        _keppAlive = f'Enable (in keep-alive service)'
+    else:
+        _keppAlive = f'disable'
+    if _TunnelDict["Highly_Restricted_Networks"].get('Enable',False):            
+        ModeChr = f'enable'
+    else:
+        ModeChr = f'disable'
+
+    _isActive = _TunnelDict.get('is_active',True)
+
+    TunnelStatus = {}
+    TunnelStatus['Title'] = _Title
+    TunnelStatus['source'] = _SourceOrRemote
+    TunnelStatus['source'] = _SourceOrRemote
+    TunnelStatus['ssh_server'] = _SshServer
+    TunnelStatus['type'] = _Type
+    TunnelStatus['authentication'] = _authentication
+    TunnelStatus['final_adress'] = _Final_adress
+    TunnelStatus['running'] = _status
+    TunnelStatus['keep_alive_mode'] = _keppAlive
+    TunnelStatus['highly_restricted_networks_mode'] = ModeChr
+    TunnelStatus['tunnel_enabled'] = _isActive
+    TunnelStatus['pid'] = _pid
+    return TunnelStatus
+
+def GetStatusAllTunnel():
+    _TUNNEL_LIST = RefreshTunnelList()
+    TunnelStatus = {}
+    for _T in _TUNNEL_LIST:
+        _TunnelDict = _TUNNEL_LIST[_T]        
+        _TunnelSTS = GetTunnelStatusByDict(_TunnelDict)
+        TunnelStatus[_TunnelDict['Code']] = _TunnelSTS
+    return TunnelStatus
 
 def printTunnelList():
-    for _T in TUNNEL_LIST:            
-        _TunnelDict = TUNNEL_LIST[_T]        
+    _TUNNEL_LIST = RefreshTunnelList()
+    for _T in _TUNNEL_LIST:            
+        _TunnelDict = _TUNNEL_LIST[_T]        
         _LServer = _TunnelDict.get("Source_Server","localhost")
         _LPort = _TunnelDict.get("Source_port",None)
         _sshPort = _TunnelDict.get("ssh_port",22)
@@ -855,14 +937,9 @@ def CreateCommamd(TunnleDict, TypeOfTunnel,DebugMode = False):
 def FnStartTunnel(TunnleDict = None,StartNewSession = True,DebugMode = False):
     IsActive = TunnleDict.get('is_active',True)
     if IsActive is False:
-        msg = f"🔥😵🔥 Tunnel [ {TunnleDict['Name']} ] is deactivated, Please activate it first from the edit menu."
-        return  False,msg    
+        msg = f"🔥😵🔥 Tunnel [ {TunnleDict['Name']} ] is deactivated, Please activate it first."
+        return  False,msg,-1
     Command = CreateCommamd(TunnleDict=TunnleDict,TypeOfTunnel=TunnleDict["Type"].lower(),DebugMode=DebugMode)
-#    CommandStr = ''
-#    for _ in Command:
-#        CommandStr += f' {_}'
-#    CommandStr = CommandStr.strip()
-    #commandstr = ' '.join(Command)
     TunnelCode = TunnleDict['Code']
     try:
 
@@ -878,9 +955,9 @@ def FnStartTunnel(TunnleDict = None,StartNewSession = True,DebugMode = False):
 
         _rst = CheckStatusTunnel(TunnleDict)
         if _rst[0]:
-            return True,''
+            return True,'',_rst[1]
         else:
-            return False,_rst[1]
+            return False,'',_rst[1]
     except Exception as e:
         print(f"Exception: {e}")
         msg = (f"🔥 Exception occurred while starting autossh: {e}")        
@@ -1000,13 +1077,13 @@ def CheckStatusTunnel(_Tunnle):
                         if UserIP in CmdLine:
                             if _SSHType in CmdLine:
                                 if _SSHTypeServer in CmdLine:
-                                    return True, proc.pid                                        
+                                    return True, '',proc.pid                                        
     except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):        
-        return False,'error'
+        return False,'error',-1
     except Exception as e:
         msg = (f"🔥 {e}")        
-        return False,msg
-    return False,''
+        return False,msg,-1
+    return False,'',-1
     
 
 def CheckAutoSSHCommand():
@@ -1136,6 +1213,7 @@ def DeleteTunnel(TunnelDict,NoWait=False):
         with open(TunnelJsonFilePath, 'w') as json_file:
             json.dump(TUNNEL_LIST, json_file, indent=4)
             print(f"{_B}{_fw}\nTunnel [ {_fEx_g}{TunnelDict['Name']}{_fw} ] Deleted Successfully!{_reset}")
+            TUNNEL_LIST = NewTunnelList
             if NoWait is False:
                 lib.BaseFunction.PressEnterToContinue()
             return True
@@ -1171,6 +1249,127 @@ def ClearTunnleLog(TunnelCode):
         return False,f'❌ Error on Clear Logd \n{e}'
     return True, "🧹 🧹 🧹  Clear Tunnel log Successfully 🧹 🧹 🧹"
 
+
+####### API
+
+def EnableorDisableTunnelByCode(TunnelCode:str,Changeto:bool):    
+    _TUNNEL_LIST = RefreshTunnelList()
+    for _t in _TUNNEL_LIST:
+        tunnel = _TUNNEL_LIST[_t]
+        if _t.lower().strip() == TunnelCode.lower().strip():            
+            tunnel['is_active'] = Changeto
+            _rst = lib.BaseFunction.SaveJsonFile(JsonFile=TunnelJsonFilePath,JsonData=TUNNEL_LIST,Verbus=False)
+            return _rst
+    return False,"Tunnel Code not found"
+        
+def RestartTunnel(TunnelDict:dict):
+    rst = CheckStatusTunnel(TunnelDict)
+    if rst[0]:                
+        TnlStatus1 = KillProcessByPID(pid=rst[2])
+        time.sleep(2)
+    TnlStatus = FnStartTunnel(TunnleDict=TunnelDict,DebugMode=False)
+    return TnlStatus
+    
+
+def FnCloneTunnelbyCode(TunnelCode4Clone:str,NewTunnelCode = str):
+    _TUNNEL_LIST = RefreshTunnelList()
+    for _t in _TUNNEL_LIST:
+        if _t.lower().strip() == NewTunnelCode.lower().strip():
+            FileTunnelName = _TUNNEL_LIST[_t]['Name']
+            return False,f"Tunnel Code [ {NewTunnelCode} ] already exists for Tunnel [ {FileTunnelName} ]\n Tunnel Code must be unique."
+    for _t in _TUNNEL_LIST:        
+        if _t.lower().strip() == TunnelCode4Clone.lower().strip():            
+            tunnel = _TUNNEL_LIST[_t]
+            NewTunnel = tunnel.copy()
+            NewTunnel['Code'] = NewTunnelCode
+            NewTunnel['Name'] = f"{NewTunnel['Name']} (Clone)"
+            NewTunnel['status'] = False
+            NewTunnel['is_active'] = False            
+            _TUNNEL_LIST[NewTunnelCode] = NewTunnel
+            _rst = lib.BaseFunction.SaveJsonFile(JsonFile=TunnelJsonFilePath,JsonData=TUNNEL_LIST,Verbus=False)
+            if _rst:
+                return True,f"Tunnel [ {tunnel['Name']} ] cloned successfully to [ {NewTunnel['Name']} ] with Code [ {NewTunnelCode} ]"
+            else:
+                return False,"Error on save Tunnel to file."
+
+
+def Fn_getTunnelStatus(TunnelDict=dict): 
+    Rst = ViewTunnleStatus(TunnelDict=TunnelDict,ReturnDictResualt=True)
+    MsgDict = {}
+    if Rst.get("isActive",False):        
+        #MsgLines.append(f"Tunnel {_tunnel.get('Name','N/A')} is running. 🚀  with PID {Rst.get('pid','N/A')}\n")        
+        MsgDict["pid"] = Rst.get('pid','N/A')
+    else:
+        MsgDict["pid"] = ''
+        #MsgLines.append(f"Tunnel {_tunnel.get('Name','N/A')} is not running. ⏹️ \n\n")
+    MsgDict["Name"] = TunnelDict.get('Name','N/A')
+    MsgDict["Type"] = TunnelDict.get('Type','N/A')
+    MsgDict["Highly_Restricted_Networks_enalbe"] = TunnelDict.get('Highly_Restricted_Networks',{}).get('Enable',False)
+    MsgDict["ssh_ip"] = TunnelDict.get('ssh_ip','N/A')
+    MsgDict["ssh_user"] = TunnelDict.get('ssh_user','N/A')
+    MsgDict["ssh_port"] = TunnelDict.get('ssh_port','N/A')
+    MsgDict["FinalPort"] = TunnelDict.get('FinalPort','N/A')
+    MsgDict["Keep_Alive"] = TunnelDict.get('Keep_Alive',False)
+    MsgDict["ExitOnForwardFailure"] = TunnelDict.get('Highly_Restricted_Networks',{}).get('ExitOnForwardFailure','N/A')
+    MsgDict["ServerAliveInterval"] = TunnelDict.get('Highly_Restricted_Networks',{}).get('ServerAliveInterval','N/A')
+    MsgDict["ServerAliveCountMax"] = TunnelDict.get('Highly_Restricted_Networks',{}).get('ServerAliveCountMax','N/A')
+    MsgDict["MonitorPort"] = TunnelDict.get('Highly_Restricted_Networks',{}).get('MonitorPort','N/A')
+
+    if Rst.get("isActive",False):
+        MsgDict["Process"] = {}
+        MsgDict["Process"]["name"] = Rst.get('Process',{}).get('name','N/A')
+        MsgDict["Process"]["pid"] = Rst.get('pid','N/A')
+        MsgDict["Process"]["start_time"] = Rst.get('Process',{}).get('start_time','N/A')
+        MsgDict["Process"]["exe"] = Rst.get('Process',{}).get('exe','N/A')
+        MsgDict["Process"]["cmdline"] = Rst.get('Process',{}).get('cmdline','N/A')
+        MsgDict["Process"]["status"] = Rst.get('Process',{}).get('status','N/A')
+        MsgDict["Process"]["user"] = Rst.get('Process',{}).get('user','N/A')
+        MsgDict["Process"]["memory-RSS"] = Rst.get('Process',{}).get('memory-RSS','N/A')
+        MsgDict["Process"]["memory-VMS"] = Rst.get('Process',{}).get('memory-VMS','N/A')
+        MsgDict["Process"]["cpu_percent"] = Rst.get('Process',{}).get('cpu_percent','N/A')
+        MsgDict["Process"]["parent_process"] = Rst.get('Process',{}).get('parent_process','N/A')
+        MsgDict["Process"]["children_process"] = Rst.get('Process',{}).get('children_process','N/A')
+        MsgDict["Process"]["connections"] = Rst.get('connections',[])
+
+        ConnectionsList = Rst.get('connections',[])        
+            #MsgLines.append(f"  ▫️ {conn}\n")
+        MsgDict["Process"]["connections"] = ConnectionsList
+    return MsgDict
+
+
+def FnSetAuthenticationMode(_TempTunnelList:dict, TunnelCode:str,Password:str='',KeyPath:str='',AuthenticationMode=''):
+    """"Set the authentication mode for each tunnel - Use In API """
+    if AuthenticationMode.strip() == "":
+        _TempTunnelList[TunnelCode]['authentication'] = ''
+        _TempTunnelList[TunnelCode]['password'] = ''
+        _TempTunnelList[TunnelCode]['key_path'] = ''
+    elif AuthenticationMode.lower().strip() == 'password':
+        if Password is None:
+            return False,f"Password cannot be empty for password authentication." 
+        if Password.strip() == "":
+            return False,f"Password cannot be empty for password authentication."
+        _TempTunnelList[TunnelCode]['authentication'] = 'password'
+        _TempTunnelList[TunnelCode]['key_path'] = ''
+        _TempTunnelList[TunnelCode]['password'] = Password
+    elif AuthenticationMode.lower().strip() in ['key_path','key', 'keyfile']:
+        if KeyPath.strip() == "":
+            return False,f"SSH Key path cannot be empty for key authentication."
+        if not os.path.isfile(KeyPath):
+            return False,f"SSH Key file not found at path: {KeyPath}"
+        _TempTunnelList[TunnelCode]['authentication'] = 'key_path'
+        _TempTunnelList[TunnelCode]['password'] = ''
+        _TempTunnelList[TunnelCode]['key_path'] = KeyPath
+    else:
+        return False,f"Invalid Authentication Mode: {AuthenticationMode}"
+    return True,"Authentication Mode set successfully.",_TempTunnelList
+    
+    
+        
+        
+
+
+    
+    
 
 signal.signal(signal.SIGINT, lib.BaseFunction.handler)
 

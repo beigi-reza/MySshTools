@@ -4,5 +4,24 @@
     "def_ssh_key": "",
     "Tag_View": true,
     "SSHKEY": "/opt/MySshTools/key/id_rsa",
-    "log_path": "/var/log"
+    "log_path": "/var/log",
+    "encryption_algorithm": "HS256",
+    "secret_key": "e9szyG10YKF3ADHghcRA2ursvOMtYS0bhbLmJsu8",    
+    "token_expiration_minutes": 30,
+    "services":{
+        "Nginx":{
+            "name": "Nginx",
+            "description": "Nginx Web Server",
+            "exec_start": "nginx",
+            "user":"root",
+            "working_dir": "/etc/nginx"
+        },
+        "keep-alive":{
+            "name": "keep-alive",
+            "description": "Keep Alive Service",
+            "exec": "keep-alive.py",
+            "user":"root"            
+        }
+
+    }
 }
