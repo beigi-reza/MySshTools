@@ -29,13 +29,13 @@ def ScpMenu(ServerList):
         destinationLst = ServerSelect(Mode='Destination',LocalIsValid=True,mode='to')
         DestPath = GetAddress(InLocal=False,EnterIsValid=True,mode='dfile')
         if DestPath in ['','.']:
-            if destinationLst['IP'] == 'localhost':
+            if destinationLst['ip'] == 'localhost':
                 DestPath = '.'
             else:
-                if destinationLst['User'] == 'root':
+                if destinationLst['user'] == 'root':
                     DestPath = '/root'
                 else:
-                    DestPath = f'/home/{destinationLst["User"]}'            
+                    DestPath = f'/home/{destinationLst["user"]}'            
     else:
         destinationLst = ServerList
         SourceLst = ServerSelect(Mode='Source',LocalIsValid=True,mode='both')
@@ -64,23 +64,23 @@ def ScpCommand():
     else:
         ScpCommand = 'scp -r -P'        
         
-    if SourceLst["IP"] == 'localhost':
-        _Port = destinationLst['Port']
-        _User = destinationLst['User']                
-        _IP = destinationLst['IP']
+    if SourceLst["ip"] == 'localhost':
+        _Port = destinationLst['port']
+        _User = destinationLst['user']                
+        _IP = destinationLst['ip']
         ScpCommand = f'{ScpCommand} {_Port} {SourcePath} {_User}@{_IP}:{DestPath}'
-    elif destinationLst["IP"] == 'localhost':
-        _Port = SourceLst['Port']
-        _User = SourceLst['User']                
-        _IP = SourceLst['IP']
+    elif destinationLst["ip"] == 'localhost':
+        _Port = SourceLst['port']
+        _User = SourceLst['user']                
+        _IP = SourceLst['ip']
         ScpCommand = f'{ScpCommand} {_Port} {_User}@{_IP}:{SourcePath} {DestPath}'
     else:
-        _s_Port  = SourceLst["Port"]
-        _s_IP  = SourceLst["IP"]
-        _s_User  = SourceLst["User"]
-        _d_Port = destinationLst["Port"]
-        _d_IP  = destinationLst["IP"]
-        _d_User  = destinationLst["User"]
+        _s_Port  = SourceLst["port"]
+        _s_IP  = SourceLst["ip"]
+        _s_User  = SourceLst["user"]
+        _d_Port = destinationLst["port"]
+        _d_IP  = destinationLst["ip"]
+        _d_User  = destinationLst["user"]
         if customSSHPortOnBothServer() is False:
             ScpCommand = f'{ScpCommand} {_s_Port} {_s_User}@{_s_IP}:{SourcePath} {_d_User}@{_d_IP}:{DestPath}'
         else:
@@ -99,11 +99,11 @@ def ScpCommand():
 
 
 def customSSHPortOnBothServer():
-    if SourceLst["IP"] != "localhost":       
-        if destinationLst["IP"] != 'localhost':          
-            if SourceLst["Port"] != '22':
-                if destinationLst["Port"] != '22':
-                    if SourceLst["Port"] != destinationLst["Port"]:                        
+    if SourceLst["ip"] != "localhost":       
+        if destinationLst["ip"] != 'localhost':          
+            if SourceLst["port"] != '22':
+                if destinationLst["port"] != '22':
+                    if SourceLst["port"] != destinationLst["port"]:                        
                         return True
     return False
 
@@ -113,8 +113,8 @@ def SpecifyingFomOrTo(ServerList):
         lib.BaseFunction.clearScreen()
         lib.Logo.SshToolsLogoScp()
         lib.Logo.ScpProgress(SourceLst=SourceLst,destinationLst=destinationLst,SourcePath=SourcePath,DestPath=DestPath,mode='')
-        core.printServerInfo(ServerList["Code"])        
-        print(f'\n\n{_B}{_fw}Server [ {_fEx_y}{ServerList["ServerName"]} ( {_bEx_y}{_fbl}{ServerList["IP"]}{_reset}{_B} {_fEx_y}) ]{_fw} is {_fEx_g}Source{_fw} or {_fEx_c}Destination{_fw} ?{_reset}')
+        core.printServerInfo(ServerList["code"])        
+        print(f'\n\n{_B}{_fw}Server [ {_fEx_y}{ServerList["server_name"]} ( {_bEx_y}{_fbl}{ServerList["ip"]}{_reset}{_B} {_fEx_y}) ]{_fw} is {_fEx_g}Source{_fw} or {_fEx_c}Destination{_fw} ?{_reset}')
         #UserInput = input(f'{_B}{_fEx_g}ENTER{_fw} for source or {_fEx_c}Any Key{_fw} for destination{_reset} : ')        
         UserInput = input(f'{_B}{_fw}Type [ {_fEx_g}f / s {_fw}] for Source or [ {_fEx_c}d / t{_fw} ] for Destination  > {_reset}')
         if UserInput.strip() in ['','f','s','source','from']:
@@ -163,15 +163,15 @@ def SearchServer(msg='',Mode = 'Destination',LocalIsValid = True,mode=''):
                     if FileNumber <= 40:
                         filename = ListFilesDict[FileNumber]
                         lst = {}
-                        lst["IP"] = "localhost"
-                        lst["ServerName"] = "localhost"
+                        lst["ip"] = "localhost"
+                        lst["server_name"] = "localhost"
                         lst["FileName"] = filename
                         return lst
                 except:
                     if lib.BaseFunction.IsExist(UserInput):
                         lst = {}
-                        lst["IP"] = "localhost"                        
-                        lst["ServerName"] = "localhost"
+                        lst["ip"] = "localhost"                        
+                        lst["server_name"] = "localhost"
                         lst["FileName"] = UserInput
                         return lst
                 
@@ -201,7 +201,7 @@ def ServerSelect(Mode = 'Destination',LocalIsValid = False,mode = ''):
         lib.Logo.ScpProgress(SourceLst=SourceLst,destinationLst=destinationLst,SourcePath=SourcePath,DestPath=DestPath,mode=mode)
         ServerLst = core.printServerInfo(ServerCode)                
         
-        print(f'\n{_B}{_fw}Are you Shure to Select Server [{_fy}{ServerLst["ServerName"]} ( {_bEx_y}{_fbl} {ServerLst["IP"]} {_reset}{_fy} )]{_fw} for {_fEx_r}{Mode}{_reset}:')
+        print(f'\n{_B}{_fw}Are you Shure to Select Server [{_fy}{ServerLst["server_name"]} ( {_bEx_y}{_fbl} {ServerLst["ip"]} {_reset}{_fy} )]{_fw} for {_fEx_r}{Mode}{_reset}:')
         UserInput = input(f'{_fEx_g}ENTER{_fEx_w} for Select as {_fEx_g}{Mode}{_fEx_w} or Any Key for destination : {_reset}')
         if UserInput.strip() == '':
             return ServerLst

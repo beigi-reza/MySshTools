@@ -3,10 +3,9 @@
 Telegram Bot with Beautiful Emoji Menu
 python-telegram-bot >= 20.x (async)
 """
-import re
+
 import copy
 import os
-from PIL import Image
 import lib.BaseFunction as base
 import logging
 #from tunnel import TUNNEL_LIST,RefreshTunnelList
@@ -15,6 +14,7 @@ import lib.Edit_or_Create as EditCreateFunc
 from tunnel import RefreshTunnelList,DropAllSShTunnel,StartAllTunnel,SSHKEYDir,GetTunnelLogDetails,ClearTunnleLog
 from pathlib import Path
 import lib.ServiceManagmentHandler as SVM_HandlerFunc
+import sys
 from telegram import (
     Update,
     InlineKeyboardButton,
@@ -39,9 +39,13 @@ ADMIN_PERMISSION = TelegramJsonConfig.get('primession',{}).get('admin',[])
 TELEGRAM_BOT_TOKEN = TelegramJsonConfig.get('bot_token','')
 Telegram_STICKER = TelegramJsonConfig.get('stickers','')
 
+###
 TELEGRAM_BOT_TOKEN= '8339475059:AAHcclq2qcA3PLXB388Vqc-q-36q3jx2Y5g'
+###
+
 WAITING_FILE = 1
 STANDARD_FIELDS_LIST = ["Name","sship","sshuser","sshport",'SourceServer','Sourceport',"FinalPort","MonitorPort"] 
+
 msgHelp = """
 Welcome to the Administration bot Token !
 Here are some commands you can use:
@@ -53,6 +57,7 @@ Here are some commands you can use:
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)            
 
+RunModeStr = 'RunAsService'
 # ===============================================
 #                  MENU FUNCTIONS
 # ===============================================
@@ -1210,10 +1215,13 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     app.add_handler(MessageHandler(filters.Document.ALL, document_handler))
 
-
     print("Bot is running… 😤")
     app.run_polling()
     
 
 if __name__ == "__main__":    
-    main()
+    if len(sys.argv) == 1:        
+        print(f"You should not run this file directly")
+    else :
+        if sys.argv[1] == RunModeStr:
+            main()

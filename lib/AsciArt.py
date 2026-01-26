@@ -2,9 +2,17 @@ import color.Back as Back
 import color.Fore as Fore
 import color.Style as Style
 import art
+from color.Style import _B,_D,_N,_reset
+from color.Back import _bw,_by,_bb,_bbl,_br,_bc,_bg,_bm,_brst,_bEx_w,_bEx_y,_bEx_b,_bEx_bl,_bEx_r ,_bEx_c ,_bEx_g ,_bEx_m ,_b_rest
+from color.Fore import _fw,_fy,_fb,_fbl,_fr,_fc,_fg,_fm,_fEx_w,_fEx_y,_fEx_b,_fEx_bl,_fEx_r,_fEx_c,_fEx_g,_fEx_m,_f_reset
+
+LIST_OF_EMOJI = ['🇮🇷','🇬🇧','🇷🇺','🇩🇪','🇺🇸','🏁','🇨🇳','🕛','🟦','🟩','🟨','🟧','🟥','⬜',
+                '😤','❌','✅','🚫','♻️','✏️','🙁','🔌','📍','⚙️','🚀','⏹️','🔰','➕',
+                '🗑️','💡','🔒','🔐','🔑','↗️','🔄','👤','🌐','🏠','🖥️','⚠️','🛰️','⚡']
+
 
 ClockIconList = ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚']
-def Fn_CenterString(originalString: str, target_length: int, padding_char: str = " ",AlignmentMode = "center") -> str:
+def FnAlignmentStr(originalString: str, target_length: int, padding_char: str = " ",AlignmentMode = "center") -> str:
     """اضافه کردن و بزرگ کردن رشته دریافتی و برگشت آن به طول درخواستی
 
     Args:
@@ -31,7 +39,7 @@ def Fn_CenterString(originalString: str, target_length: int, padding_char: str =
         _str = padding_char + originalString + padding_char * total_padding
     elif AlignmentMode.lower() == 'right':
         total_padding = total_padding - 1
-        _str = padding_char * total_padding + originalString + padding_char
+        _tr = padding_char * total_padding + originalString + padding_char
     return _str
 
 def wrap_text(text, max_width=100):
@@ -84,6 +92,7 @@ def BorderIt(Text:str,BorderColor = '',TextColor = '', WidthBorder = 100):
     Dwonline = BorderColor + f'└{RowLine}┘' + Style.RESET_ALL
     ClmnChar = f'{BorderColor}│{Style.RESET_ALL}'
     lines = wrap_text(text=Text,max_width=WidthBorder - 1)
+    print("")
     print(Upline)
     for line in lines:
         if LenStr == WidthBorder:
@@ -94,6 +103,7 @@ def BorderIt(Text:str,BorderColor = '',TextColor = '', WidthBorder = 100):
             space_al = ' '    
         print(f'{ClmnChar} {TextColor}{line}{space_al}{ClmnChar}')
     print(Dwonline)
+    print("")
 
 def ArtText(Text = "",Font = "",color = Fore.WHITE,PrintIt = True):
     FontList = ['straight',
@@ -702,6 +712,44 @@ def GetCountryNameFromCode(CountryCode:str = ''):
         if code == CountryCode:
             return info['name'], info['emoji']
     return 'Unknown', '🏳️'
+
+def GenerateMenu(MenuList = [],defautl_color = _fw ,SeletedColor = _fb,Titel = 'Menu Title...',Desciption= '',InputMsg = 'Enter Command : >'):
+    Maxlen = len(Titel)
+    for _x in MenuList:
+        if Maxlen < len(_x):
+            Maxlen = len(_x)
+    if Maxlen < 45:
+        Maxlen = 45
+    print("")
+    print(defautl_color + '-' * Maxlen)
+    print(defautl_color + '-' * 5 +  f'> {SeletedColor}{Titel}{_reset}')
+    print(defautl_color + '-' * Maxlen + "\n")
+    count = 1
+    for item in MenuList:
+        print(f'{defautl_color}( {SeletedColor}{count} {defautl_color}) {item}{_reset}')
+        count = count +1
+    print(f'{defautl_color}( {SeletedColor}b {defautl_color}) Back to ...{_reset}')
+    print(f'{defautl_color}( {SeletedColor}q {defautl_color}) Quit {_reset}')
+    UserInput = input(f"\n{_B}{defautl_color}{InputMsg}")
+    return UserInput.lower().strip()
+
+
+
+def FnConfirmChange(MsgStr = "Are You Sure ?",YesTxt = "YES", NoText = "NO"):    
+    SaveInput = input(f'{_B}{_fw}{MsgStr} [ {_bg} {YesTxt.upper()} {_reset}{_B + _fw} / {_br} {NoText.upper()} {_reset}{_B + _fw} ] >{_reset}')
+    if SaveInput.strip() == '':
+        return None
+    elif SaveInput.lower() in ['0','n','no']:
+        return False
+    elif SaveInput.lower() in ['y','yes']:
+        return True
+
+        
+
+
+
+
+
 
 
 if __name__ == "__main__":    

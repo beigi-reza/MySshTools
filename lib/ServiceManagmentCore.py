@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Linux Service Manager - Manage systemd services
 Requires: Python 3.6+, root privileges for most operations
@@ -38,7 +37,7 @@ class ServiceManager:
         return True
     
     def create_service(self, name, description, exec_start, 
-                      user=None, working_dir=None, restart="on-failure"):
+                      user=None, working_dir=None, restart="on-failure",verbus=True):
         """
         Create a systemd service file
         
@@ -77,86 +76,99 @@ WantedBy=multi-user.target
             with open(service_file, 'w') as f:
                 f.write(service_content)
             Msg = f"✓ Service file created: {service_file}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True, Msg
         except PermissionError:
             Msg = f"✗ Permission denied. Run with sudo to create service files."
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
         except Exception as e:
             Msg= f"✗ Error creating service: {e}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False,Msg
     
-    def install_service(self, name):
+    def install_service(self, name,verbus=True):
         """Reload systemd daemon to recognize new service"""
         self._check_root()
         stdout, stderr, code = self._run_command("systemctl daemon-reload")
         
         if code == 0:
             Msg = f"✓ Service '{name}' installed (daemon reloaded)"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True ,Msg
         else:
             Msg= f"✗ Failed to install service: {stderr}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
     
-    def enable_service(self, name):
+    def enable_service(self, name,verbus=True):
         """Enable service to start on boot"""
         self._check_root()
         stdout, stderr, code = self._run_command(f"systemctl enable {name}")
         
         if code == 0:
             Msg = f"✓ Service '{name}' enabled"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True,Msg
         else:
             Msg = f"✗ Failed to enable service: {stderr}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
     
-    def start_service(self, name):
+    def start_service(self, name,verbus=True):
         """Start the service"""
         self._check_root()
         stdout, stderr, code = self._run_command(f"systemctl start {name}")
         
         if code == 0:
             Msg = f"✓ Service '{name}' started"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True, Msg
         else:
             Msg = f"✗ Failed to start service: {stderr}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
 
-    def restart_service(self, name):
+    def restart_service(self, name,verbus=True):
         """Start the service"""
         self._check_root()
         stdout, stderr, code = self._run_command(f"systemctl restart {name}")
         
         if code == 0:
             Msg = f"✓ Service '{name}' started"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True, Msg
         else:
             Msg = f"✗ Failed to restart service: {stderr}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
 
 
-    def stop_service(self, name):
+    def stop_service(self, name,verbus=True):
         """Stop the service"""
         self._check_root()
         stdout, stderr, code = self._run_command(f"systemctl stop {name}")
         
         if code == 0:
             Msg= f"✓ Service '{name}' stopped"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True, Msg
         else:
             Msg = f"✗ Failed to stop service: {stderr}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
 
     def get_log (self, name,lines=100):
@@ -167,7 +179,7 @@ WantedBy=multi-user.target
         LogsDetail = stdout if stdout else stderr        
         return LogsDetail
 
-    def status_service(self, name,ReturnLog=False):
+    def status_service(self, name,ReturnLog=False,Verbus = True):
         """Check service status"""
         MSG_list = {}
         # Get status output
@@ -193,39 +205,44 @@ WantedBy=multi-user.target
         status_display = status_map.get(active_state, f'⚪ {active_state.upper()}')
         enabled_display = '✓ ENABLED' if enabled_state == 'enabled' else '✗ DISABLED'
         enabled_Str = 'ENABLED' if enabled_state == 'enabled' else 'DISABLED'
-        
-        print(f"\n{'='*60}")
-        print(f"Status for service: {name}")        
-        print(f"{'='*60}")
-        print(f"Active State:  {status_display}")
-        print(f"Enabled State: {enabled_display}")       
-        print(f"{'='*60}")
+        if Verbus:
+            print(f"\n{'='*60}")
+            print(f"Status for service: {name}")        
+            print(f"{'='*60}")
+            print(f"Active State:  {status_display}")
+            print(f"Enabled State: {enabled_display}")       
+            print(f"{'='*60}")
+            print(f"{'='*60}\n")
         LogsDetail = ""
         LogsDetail = stdout if stdout else stderr        
-        print(f"{'='*60}\n")
         MSG_list['active_state'] = active_state.upper()
         MSG_list['enabled_state'] = enabled_Str
+        MSG_list['status_display'] = status_display
+        MSG_list['enabled_display'] = enabled_display
         MSG_list['name'] = name        
         if ReturnLog:
-            print(LogsDetail)
+            if Verbus:
+                print(LogsDetail)
             MSG_list['log'] = LogsDetail
         return code == 0, MSG_list
     
-    def disable_service(self, name):
+    def disable_service(self, name,verbus=False):
         """Disable service from starting on boot"""
         self._check_root()
         stdout, stderr, code = self._run_command(f"systemctl disable {name}")
         
         if code == 0:
             Msg = f"✓ Service '{name}' disabled"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return True, Msg
         else:
             Msg = f"✗ Failed to disable service: {stderr}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False, Msg
     
-    def delete_service(self, name):
+    def delete_service(self, name,verbus=True):
         """Delete service file"""
         self._check_root()
         
@@ -238,21 +255,25 @@ WantedBy=multi-user.target
         try:
             if service_file.exists():
                 service_file.unlink()
-                self._run_command("systemctl daemon-reload")
+                self._run_command("systemctl daemon-reload")                
                 Msg = f"✓ Service '{name}' deleted"
-                print(Msg)
+                if verbus:
+                    print(Msg)
                 return True, Msg
             else:
                 Msg = f"✗ Service file not found: {service_file}"
-                print(Msg)
+                if verbus:
+                    print(Msg)
                 return False, Msg
         except PermissionError:
             Msg = f"✗ Permission denied. Run with sudo to delete service files."
-            print(Msg)
+            if verbus:            
+                print(Msg)
             return False, Msg
         except Exception as e:
             Msg= f"✗ Error deleting service: {e}"
-            print(Msg)
+            if verbus:
+                print(Msg)
             return False,Msg
 
 
@@ -332,7 +353,8 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        #main()
+        print(f"You should not run this file directly")
     except KeyboardInterrupt:
         print("\n\nProgram interrupted by user. Exiting...")
         sys.exit(0)

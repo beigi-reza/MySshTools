@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -7,21 +8,33 @@ from datetime import datetime, timedelta
 import jwt
 from passlib.context import CryptContext
 import tunnel as TunnelManagment
-from tunnel import current_directory,TUNNEL_LIST,LOG_PATH,TunnelJsonFilePath
+from tunnel import current_directory,TUNNEL_LIST,LOG_PATH,TunnelJsonFilePath,JsonConfig
 import lib.BaseFunction
 import os
+import sys
 import zipfile
+import copy
+import lib.TunnelCore
+from lib.ServiceManagmentCore import ServiceManager
+manager = ServiceManager()
 # Configuration
-SECRET_KEY = "your-secret-key-change-this-in-production"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 ##################
-ServerListPath = os.path.join(current_directory, "conf/UserConfig.json")
-UserJson= lib.BaseFunction.LoadJsonFile(JsonFile=ServerListPath,Verbus=False,ReternValueForFileNotFound={}) 
-USER_DICT = UserJson.get("users", {})
-
-
+ServerListPath = os.path.join(current_directory, "conf/config.json")
+ConfigJson= lib.BaseFunction.LoadJsonFile(JsonFile=ServerListPath,Verbus=False,ReternValueForFileNotFound={}) 
+UserHashed = ConfigJson.get("api_config",{}).get("user",'')
+PasswordHashed = ConfigJson.get("api_config",{}).get("password",'')
+#SERVICE_LIST = JsonConfig.get('services',{})
+SERVICE_LIST = lib.TunnelCore.Generate_SERVICE_LIST()
+SECRET_KEY = ConfigJson.get('api_config',{}).get('api_secret_key','your-secret-key-change-this-in-production')
+ALGORITHM = ConfigJson.get('api_config',{}).get('encryption_algorithm','HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = ConfigJson.get('api_config',{}).get('token_expiration_minutes', 30)
+PUBLISHED_PORT = ConfigJson.get('api_config',{}).get('publish_port', 8000)
+publish_on_localhost = ConfigJson.get('api_config',{}).get('publish_on_localhost', True)
+if publish_on_localhost:
+    PUBLISH_IN = '127.0.0.1'
+else:
+    PUBLISH_IN = '0.0.0.0'
 # Initialize FastAPI
 app = FastAPI(
     title="🦑 SSH Tunnel Managment API",
@@ -34,7 +47,7 @@ app = FastAPI(
 # Security
 security = HTTPBearer()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+RunModeStr = 'RunAsService'
 
 ####################################
 #########   Models
@@ -126,6 +139,16 @@ class AuthenticationMode(BaseModel):
     authentication : str
     password: Optional[str] = None
     key_path: Optional[str] = None
+
+class ServiceLog(BaseModel):
+    service_name : str
+    active_State :str 
+    enabled_state :str
+    logs:str
+
+
+
+
 ####################################
 #########   Helper functions
 ####################################
@@ -155,14 +178,22 @@ def decode_token(token: str):
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
-
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
-    payload = decode_token(token)
+    try:
+        payload = decode_token(token)    
+    except:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")        
     User = payload.get("sub")
-    if User is None or User not in USER_DICT:
+    if User != UserHashed:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-    return USER_DICT[User]
+#    return USER_DICT[User]
+    UserDict = {
+        "username" : UserHashed,
+        "password" : PasswordHashed,
+    }
+    return UserDict
+
 
 ####################################
 #########   Routes
@@ -177,13 +208,13 @@ async def info():
 @app.post("/login", response_model=Token, tags=["Authentication"])
 async def login(user_credentials: UserLogin):
     """Login and receive JWT token"""    
-    user = USER_DICT.get(user_credentials.user)
+    user = UserHashed
     UserPassword = user_credentials.password
-    HashedPassword = user.get("password") if user else None
+    HashedPassword = PasswordHashed if user else None
     if not user or not verify_password(plain_password=UserPassword, hashed_password=HashedPassword):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
+            detail="Incorrect User or password"
         )
     
     access_token = create_access_token(data={"sub": user_credentials.user})
@@ -429,7 +460,7 @@ async def delete_tunnel_by_code(code: str, current_user: dict = Depends(get_curr
 ##########   Debug Mode routes
 ###########################################
 
-@app.get("/debug/GetTunnelStatus/{code}", tags=["Debug"])
+@app.get("/debug/GetTunnelStatus/{code}", tags=["Debug Tunnel"])
 async def debug_get_tunnel_status(code: str, current_user: dict = Depends(get_current_user)):
     """Debug: Get SSH tunnel status by code"""        
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
@@ -440,7 +471,7 @@ async def debug_get_tunnel_status(code: str, current_user: dict = Depends(get_cu
             return status
     raise HTTPException(status_code=404, detail="Tunnel not found")
 
-@app.get("/StartTunnelInDebugMode/{code}", tags=["Debug"])
+@app.get("/StartTunnelInDebugMode/{code}", tags=["Debug Tunnel"])
 async def debug_run_tunnel_in_debug_mode(code: str, current_user: dict = Depends(get_current_user)):
     """Debug: Run SSH tunnel in debug mode by code"""        
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
@@ -464,7 +495,7 @@ async def debug_run_tunnel_in_debug_mode(code: str, current_user: dict = Depends
             return {"is_active": status[0], "TunnelMsg": statusMsg, "Logs": Logs}
     raise HTTPException(status_code=404, detail="Tunnel not found")
 
-@app.get("/GetTunnelCommand/{code}", tags=["Debug"])
+@app.get("/GetTunnelCommand/{code}", tags=["Debug Tunnel"])
 async def debug_get_tunnel_command(code: str, current_user: dict = Depends(get_current_user)):
     """Debug: Get SSH tunnel command by code"""        
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
@@ -480,7 +511,7 @@ async def debug_get_tunnel_command(code: str, current_user: dict = Depends(get_c
             return {"CommandLine": FullCommandLine}
     raise HTTPException(status_code=404, detail="Tunnel not found")
 
-@app.get("/GetTunnelJson/{code}", tags=["Debug"])
+@app.get("/GetTunnelJson/{code}", tags=["Debug Tunnel"])
 async def debug_get_tunnel_json(code: str, current_user: dict = Depends(get_current_user)):
     """Debug: Get SSH tunnel JSON by code"""        
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
@@ -490,7 +521,7 @@ async def debug_get_tunnel_json(code: str, current_user: dict = Depends(get_curr
             return tunnel
     raise HTTPException(status_code=404, detail="Tunnel not found")
 
-@app.post("/GetTunnelLogs/{code}",tags=["Debug"])
+@app.post("/GetTunnelLogs/{code}",tags=["Debug Tunnel"])
 async def debug_get_tunnel_logs(code: str, Log_Number:TunnelLogsLineNumber,current_user: dict = Depends(get_current_user)):
     _lNumber = Log_Number.LogNumber
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
@@ -505,7 +536,7 @@ async def debug_get_tunnel_logs(code: str, Log_Number:TunnelLogsLineNumber,curre
             return {"Logs": Logs}
     raise HTTPException(status_code=404, detail="Tunnel not found")
 
-@app.post("/ClearTunnelLogs/{code}",tags=["Debug"])
+@app.post("/ClearTunnelLogs/{code}",tags=["Debug Tunnel"])
 async def debug_clear_tunnel_logs(code: str, current_user: dict = Depends(get_current_user)):
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
     for _t in _TUNNEL_LIST:
@@ -518,7 +549,7 @@ async def debug_clear_tunnel_logs(code: str, current_user: dict = Depends(get_cu
                 return {"detail": f"Failed to clear logs.\n {RsrLog[1]}", "status": False}
     raise HTTPException(status_code=404, detail="Tunnel not found")
 
-@app.post("/DownloadTunnelLogs/{code}",tags=["Debug"])
+@app.post("/DownloadTunnelLogs/{code}",tags=["Debug Tunnel"])
 async def debug_download_tunnel_logs(code: str, current_user: dict = Depends(get_current_user)):
     _TUNNEL_LIST = TunnelManagment.RefreshTunnelList()
     for _t in _TUNNEL_LIST:
@@ -682,11 +713,191 @@ async def Set_authentication_method(code: str, authentication_mode: Authenticati
                         "status": False}            
     raise HTTPException(status_code=404, detail="Tunnel not found")
     
+@app.get("/GelListofService",tags=["Services"])
+async def Get_all_service(current_user:dict = Depends(get_current_user)):
+    """Get all Services"""        
+    return SERVICE_LIST
+
+@app.get("/GetListofServiceByStatus",tags=["Services"])
+async def Get_all_services_with_status(current_user:dict = Depends(get_current_user)):
+    """ Get Service With Status"""
+    ListofService = copy.deepcopy(SERVICE_LIST)
+    for _s in ListofService:
+        service = ListofService[_s]
+        Name = service.get('name',None)
+        if Name is None:
+            continue            
+        _rst = manager.status_service(Name,ReturnLog=False)
+        IsActive = _rst[0]
+        _Status = _rst[1]
+        ListofService[_s]['status'] = IsActive
+        ListofService[_s]['active_state'] = _Status["active_state"]
+        ListofService[_s]['enabled_state'] = _Status["enabled_state"]
+    return ListofService
+
+@app.post("/getServiceByName/{service_name}", tags=["Services"])
+async def Get_service_by_name(service_name:str, current_user:dict = Depends(get_current_user)):
+    """Get Service by name"""    
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == service_name.lower().strip():
+            ServiceDict = SERVICE_LIST[_n]
+            return ServiceDict
+    raise HTTPException(status_code=404, detail="Service not found")        
+
+@app.post("/getServiceStatusByName/{service_name}",tags=["Services"])
+async def Get_Service_Status_by_name(service_name:str,current_user:dict = Depends(get_current_user)):
+    """Get service Status by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == service_name.lower().strip():
+            service = SERVICE_LIST[service_name]
+            Name = service.get('name',None)
+            _rst = manager.status_service(Name,ReturnLog=False)            
+            return _rst
+    raise HTTPException(status_code=404, detail="Service not found")        
+
+@app.post("/GetServiceLogbyName/{service_name}",response_model=ServiceLog,tags=["Services"])
+async def Get_service_log_by_name(service_name:str,current_user:dict = Depends(get_current_user)):
+    """Get Service Logs by Service Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == service_name.lower().strip():
+            _res = manager.status_service(service_name,ReturnLog=True)    
+            ServerDict = _res[1]
+            active_state = ServerDict.get('active_state',None)
+            enabled_state = ServerDict.get('enabled_state',None)
+            Logs = manager.get_log(service_name,lines=30)
+            LogsDict = {}
+            LogsDict["service_name"] = service_name
+            LogsDict["active_State"] = active_state
+            LogsDict["enabled_state"] = enabled_state
+            LogsDict["logs"] = Logs
+            return LogsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/StartServiceByName/{service_name}", response_model=StatusResponse ,tags=["Services","Service Action"])
+async def Start_service_by_name(service_name:str,current_user:dict = Depends(get_current_user)):
+    """Start Service by name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == service_name.lower().strip():
+            _res = manager.start_service(service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/StopServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service Action"])
+async def Stop_setvice_by_name(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Stop Service by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+            _res = manager.stop_service(Service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/RestartServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service Action"])
+async def Restart_setvice_by_name(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Restart Service by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+            _res = manager.restart_service(Service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/CreateServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service managment"])
+async def Create_setvice_by_name(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Create Service by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+                ServiceDict = SERVICE_LIST[_n]                
+                Name = ServiceDict.get('name','')
+                Description = ServiceDict.get('description','My Service Description')
+                Exec = ServiceDict.get('exec','')
+                ExecStart = f"/usr/bin/python3 {current_directory}/{Exec}"
+                User = ServiceDict.get('user','root')
+                WorkingDir = ServiceDict.get('working_dir',current_directory)                
+                if Name == '' or Exec == '':
+                    responsDict = {
+                        "status":False,
+                        "detail": "Configuration is invalid. Name and ExecStart are required."
+                    }
+                    return responsDict
+                _res = manager.create_service(Name,Description,ExecStart,User,WorkingDir)
+                responsDict = {}
+                responsDict["status"] = _res[0]
+                responsDict["detail"] = _res[1]
+                return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+
+@app.post("/InstallServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service managment"])
+async def Install_setvice_by_name_Reload_daemon(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Install Service by Name (reload daemon)"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+            _res = manager.install_service(Service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/EnableServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service managment"])
+async def Enable_setvice_by_name(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Enable Service by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+            _res = manager.enable_service(Service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/DisableServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service managment"])
+async def Disable_setvice_by_name(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Disable Service by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+            _res = manager.disable_service(Service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+@app.post("/DeleteServiceByName/{Service_name}",response_model=StatusResponse,tags=["Services","Service managment"])
+async def Delete_setvice_by_name(Service_name:str,cu:dict = Depends(get_current_user)):
+    """ Delete Service by Name"""
+    for _n in SERVICE_LIST:
+        if _n.lower().strip() == Service_name.lower().strip():
+            _res = manager.delete_service(Service_name)
+            responsDict = {}
+            responsDict["status"] = _res[0]
+            responsDict["detail"] = _res[1]
+            return responsDict
+    raise HTTPException(status_code=404, detail="Service not found")
+
+
 
 ####################################
 #########   Run the app
 ####################################
 
+_debug = ['RunAsService']
+sys.argv.extend(_debug)
+
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    if len(sys.argv) == 1:        
+        print(f"You should not run this file directly")
+    else :
+        if sys.argv[1] == RunModeStr:
+            import uvicorn
+            uvicorn.run(app, host=PUBLISH_IN, port=PUBLISHED_PORT)

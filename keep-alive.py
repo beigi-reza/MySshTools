@@ -1,14 +1,13 @@
 #! /usr/bin/python3
-
 import lib.BaseFunction
-import tunnel as tu
 import concurrent.futures
 from datetime import datetime, timedelta
 import os
-from tunnel import TUNNEL_LIST
-from core import (
-    current_directory
-)
+import sys
+#from tunnel import TUNNEL_LIST
+from core import current_directory,TUNNEL_LIST
+from lib.TunnelCore import FnAutoRestartTunnel,SaveLogWebsite
+
 
 
 #def autostart(TUNNEL_LIST):
@@ -28,7 +27,7 @@ from core import (
 #            except Exception as e:
 #                print(f"Process {process_id} generated an exception: {e}")
 
-
+RunModeStr = 'RunAsService'
 def KeepAliveList():
     _tunnel = []
     for _t in TUNNEL_LIST:
@@ -38,7 +37,7 @@ def KeepAliveList():
     return _tunnel
 def FnStartTthread(KeepAliveTunnelList):
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(KeepAliveTunnelList)) as executor:    
-        future_to_tunnel = {executor.submit(tu.FnAutoRestartTunnel, tunnel): tunnel for tunnel in KeepAliveTunnelList}
+        future_to_tunnel = {executor.submit(FnAutoRestartTunnel, tunnel): tunnel for tunnel in KeepAliveTunnelList}
         try:
             for future in concurrent.futures.as_completed(future_to_tunnel):
                 tunnel = future_to_tunnel[future]
@@ -52,22 +51,25 @@ def FnStartTthread(KeepAliveTunnelList):
 
 
 if __name__ == "__main__":    
-    #logpath = '/tmp/keep-alive-logs'
-    logpath  = os.path.join(current_directory,'logs')
-    if os.path.exists(logpath) == False:
-        _log = f'Logs Folder not found [ {logpath} ]'
-        print (f"{_log}")        
-        lib.BaseFunction.FnExit()
+    if len(sys.argv) == 1:        
+        print(f"You should not run this file directly")
+    else :
+        if sys.argv[1] == RunModeStr:
+            logpath  = os.path.join(current_directory,'logs')
+            if os.path.exists(logpath) == False:
+                _log = f'Logs Folder not found [ {logpath} ]'
+                print (f"{_log}")        
+                lib.BaseFunction.FnExit()
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    _LineLog = f"### {timestamp},Trying Started Tunnel as Keep Alive Mode ..."
-    print (f"{_LineLog}")
-    tu.SaveLogWebsite(_LineLog)
-    #autostart(TUNNEL_LIST)
-    KeepAliveTunnelList = KeepAliveList()
-    if len(KeepAliveTunnelList) == 0:
-        _LineLog = f"### {timestamp},The keep-alive option is not enabled for any tunnel."
-        print (f"{_LineLog}")
-        tu.SaveLogWebsite(_LineLog)
-    else:
-        FnStartTthread(KeepAliveTunnelList)
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            _LineLog = f"### {timestamp},Trying Started Tunnel as Keep Alive Mode ..."
+            print (f"{_LineLog}")
+            SaveLogWebsite(_LineLog)
+            #autostart(TUNNEL_LIST)
+            KeepAliveTunnelList = KeepAliveList()
+            if len(KeepAliveTunnelList) == 0:
+                _LineLog = f"### {timestamp},The keep-alive option is not enabled for any tunnel."
+                print (f"{_LineLog}")
+                SaveLogWebsite(_LineLog)
+            else:
+                FnStartTthread(KeepAliveTunnelList)

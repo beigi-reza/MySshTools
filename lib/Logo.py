@@ -48,8 +48,11 @@ def ScpProgress(SourceLst,destinationLst,SourcePath,DestPath,mode):
     _SrcClr = f'{_fbl}{_bg}'
     _DstClr = f'{_fbl}{_bc}'
     _BColor = f'{_fy}'
-    _SourceIP = lib.BaseFunction.GetValue(SourceLst,"IP",verbus=False,ReturnValueForNone='')
-    _DestIP = lib.BaseFunction.GetValue(destinationLst,"IP",verbus=False,ReturnValueForNone='')
+    #_SourceIP = SourceLst.get('ip','')
+    _SourceIP = lib.BaseFunction.GetValue(SourceLst,"ip",verbus=False,ReturnValueForNone='')
+    _DestIP = lib.BaseFunction.GetValue(destinationLst,"ip",verbus=False,ReturnValueForNone='')
+    #_DestIP = destinationLst.get('ip','')
+    
 
     _SourceIP_Label = f'{_clearClr}{lib.AsciArt.FnAlignmentStr(originalString="From",target_length=20)}{_reset}'
     _DestIP_Label = f'{_clearClr}{lib.AsciArt.FnAlignmentStr(originalString="To",target_length=20)}{_reset}'
@@ -114,12 +117,23 @@ def sshTunnel(Mode=1):
         print(f'{_B}{_fc}|_____|_____|__|__|    |_| |___|_|_|_|_|___|_|{_reset}')
 
 def ArtText(Text = "",Font = "",color = _fw):
+    FontList = ['straight',
+                'stop',
+                'standard',
+                'stampate',
+                'shimrod',
+                'santaclara',
+                'rounded',
+                'rectangles',
+                'rammstein',
+                'ogre',
+                ]
     if Font == "":
-        Font = 'stampate'
+        Font = 'standard'
+
     TText = art.text2art(text=Text,font=Font)
     print(f'{color}{TText}{_reset}')
-    
-    
+
 
 if __name__ == "__main__":   
     print(f"{_B}{_fy}You should not run this file directly")

@@ -3,8 +3,11 @@ import lib.AsciArt
 from color.Style import _B,_D,_N,_reset
 from color.Back import _bw,_by,_bb,_bbl,_br,_bc,_bg,_bm,_brst,_bEx_w,_bEx_y,_bEx_b,_bEx_bl,_bEx_r ,_bEx_c ,_bEx_g ,_bEx_m ,_b_rest
 from color.Fore import _fw,_fy,_fb,_fbl,_fr,_fc,_fg,_fm,_fEx_w,_fEx_y,_fEx_b,_fEx_bl,_fEx_r,_fEx_c,_fEx_g,_fEx_m,_f_reset
+import lib.Logo
+import os
+import json
 
-
+from core import ServerConfigFile,SERVER_LIST,GetServerDictbyCode
 SourceAddress = ''
 DestinationPort = ''
 
@@ -51,7 +54,7 @@ def tunnleProgress(ServerDict = None ,Mode = 'local',GetValue = None):
 
 
 
-    SShServeraddr = f'{ServerDict["User"]}@{ServerDict["IP"]}:{ServerDict["Port"]}'
+    SShServeraddr = f'{ServerDict["user"]}@{ServerDict["ip"]}:{ServerDict["port"]}'
     S_SrvStr = f"{lib.AsciArt.FnAlignmentStr(originalString = f'🔌 {SourceStr}',target_length=20)}"
     SShAdr = f"{lib.AsciArt.FnAlignmentStr(originalString = f'🔑  {SShServeraddr}',target_length=30)}"
     FinalPortTitle = f"{lib.AsciArt.FnAlignmentStr(originalString = f'🏁 {_DestStr}',target_length=12)}"
@@ -85,6 +88,7 @@ def TunnelHelp(Color = _fy):
     TunnelHelpMode(Mode = 'remote',ColorBox = Color)
     TunnelHelpMode(Mode = 'dynamic',ColorBox = Color)
     print('')
+
 def TunnelHelpMode(Mode = 'local',ColorBox = _fy):
 
     FirewallStr = f'🔥 Firewall'
@@ -440,7 +444,461 @@ def CreateTunnle(Mode = None,Msg = '',TUNNEL_LIST = []):
             Msg = f'Invalid Input, Please enter a valid input [ Yes / No ]'
             continue
 
+def CreateNewConnection(ServerLIST = {}):
+    _Msg = ''
+    _ServerName = ''
+    _ip = ''
+    _port = ''
+    _user = ''
+    _tags = []
+    _code = ''
+    _group = ''
+    _icon = None
+    _authentication = ''
+    _key_file = ''
+    _password = ''
+    _FINISH = False
+    while True:
+        lib.BaseFunction.clearScreen()
+        lib.Logo.SshToolsLogo()
+        if _Msg != '':
+            lib.AsciArt.BorderIt(Text=_Msg,BorderColor=_fr,TextColor=_fy)
+            _Msg = ''            
+        print(f"\n{_B}{_fw}Create New Server ...{_reset}")
+        print(f'\n{_fw}Group Name     : {_fy}{_group}{_reset}')
+        print(f'{_fw}Code           : {_fy}{_code}{_reset}')
+        print(f'{_fw}Server Name    : {_fy}{_ServerName}{_reset}')
+        print(f'{_fw}Server IP      : {_fy}{_ip}{_reset}')
+        print(f'{_fw}Server Port    : {_fy}{_port}{_reset}')
+        print(f'{_fw}Server User    : {_fy}{_user}{_reset}')
+        print(f'{_fw}Tags:          : {_fy}{_tags}{_reset}')
+        print(f'{_fw}Authentication : {_fy}{_authentication}{_reset}')
+
+        if _group == '':            
+            SrvLst = f'{_reset}'
+            for _s in ServerLIST:
+                SrvLst = SrvLst + f'{_bEx_bl}{_fw} {_s.upper()} {_reset} '
+            print(f'{_D}{_fw}\n\nExisted Group : {SrvLst}')
+            _groupInputed = input(f'{_B}{_fw}\nEnter {_fc}Group Name{_fw} [ {_fy}Default{_fw} ] > {_fy}')
+            if _groupInputed.strip() == '':
+                _group = 'Default'.lower()
+            else:
+                _group = _groupInputed.strip().lower()
+        elif _code == '':
+            _codeInputed = input(f'{_B}{_fw}\nEnter Server {_fc}Code{_fw} > {_reset}')
+            if _codeInputed == '':
+                _Msg = 'Code not empty'
+                continue
+            elif len(_codeInputed) > 5:
+                _Msg = 'Code in 5 cht'
+                continue
+            elif ServerCodeIsUniq(NewCode=_codeInputed,ServerLIst=ServerLIST):
+                _code = _codeInputed.lower().strip()
+            else:
+                _Msg = f'Entered Code ( {_codeInputed} ) is Not Uniq'
+                continue
+        elif _ServerName == '':
+            _serverNameInputed = input(f'{_B}{_fw}\nEnter Server {_fc}Name{_fw} > {_reset}')
+            if _serverNameInputed.strip() == '':                
+                continue
+            else:
+                _ServerName = _serverNameInputed.strip()
+        elif _ip == '':
+            _ipInputed = input (f'\n{_B}{_fw}Enter {_fc}SSH{_fw} Server {_fc}IP or Hostname{_fw} > {_reset}')
+            if _ipInputed.strip() == '':
+                continue
+            else:
+                _ip = _ipInputed.strip()
+        elif _port == '':
+            _portInputed = input (f'\n{_B}{_fw}Enter {_fc}SSH{_fw} Server {_fc}Port{_fw} [ {_fy}22{_fw} ]> {_reset}')
+            if _portInputed == '':
+                _port = 22
+            else:
+                try:
+                    _port = int(_portInputed)
+                except:
+                    _Msg = "SSH Port is not a valid number"
+                    continue                    
+                if not (1 <= _port <= 65535):
+                    _Msg = 'SSH Port is out of valid range (1-65535)'
+                    _port = ''
+                    continue
+        elif _user == '':
+            _UserInputed = input (f'\n{_B}{_fw}Enter {_fc}SSH User{_fw} [ {_fy}root{_fw} ]> {_reset}')
+            if _UserInputed.lower().strip() == '':
+                _user = 'root'
+            else:
+                _user = _UserInputed.strip()
+        elif _tags == []:
+            _Tagst = ListofTags(ServerList=ServerLIST)
+            print(f'\n\n{_D}{_fw}Existed Tags {_reset}{_Tagst}')
+            _enterdTags = input(f'\n{_B}{_fw}Enter {_fc}Tags{_fw} >{_reset} ')
+            TagSpilted = _enterdTags.split(' ')
+            for _t in TagSpilted:
+                _tags.append(_t.upper())
+        elif _icon == None:
+            print('\n')
+            PrintListof_Emoji()
+            SelectedIcon = input(f'\n\n{_D}{_fw}Select {_fc}Icon{_fw} and Copy/Pate [ {_fy}No Icon{_fw} ] {_reset} > ')
+            if SelectedIcon.strip() == '':
+                _icon = ''
+            elif len(SelectedIcon.strip()) > 1:
+                _Msg = 'The number of characters allowed for an icon is a number.'
+                continue
+            else:
+                _icon = SelectedIcon.strip()
+        elif _authentication == '':
+            menuItem = []
+            menuItem.append('Use defualt authentication')
+            menuItem.append('Enter Path on key file')
+            menuItem.append('Enter Password')
+            UserSelect = lib.AsciArt.GenerateMenu(Titel='Authentication Method',
+                                        InputMsg='Select Authentication method >',
+                                        MenuList=menuItem)
+            if UserSelect == 'q':
+                lib.BaseFunction.FnExit()
+            elif UserSelect == 'b':
+                continue
+            elif UserSelect == '1':
+                _authentication = 'defualt'
+                _FINISH = True
+            elif UserSelect == '2':
+                _authentication = 'key_file'
+                continue
+            elif UserSelect == '3':
+                _authentication = 'password'
+                continue
+        elif _authentication == 'key_file':
+            if _key_file == '':
+                _inputkeyfile = input (f'\n{_B}{_fw}Enter Path of {_fc}Key file{_fw} > {_reset}')
+                if _inputkeyfile.strip() == '':
+                    continue
+                else:
+                    if not os.path.isfile(_inputkeyfile.strip()):
+                        _Msg = f"The specified key file does not exist: {_inputkeyfile}\nPlease check the path and try again."
+                        continue
+                    else:
+                        _key_file = _inputkeyfile.strip()
+                        _FINISH = True
+        elif _authentication == 'password':
+            if _password == '':
+                _inputPassword = input (f'\n{_B}{_fw}Enter {_fc}Password{_fw} > {_reset}')
+                if _inputPassword == '':
+                    continue
+                else:
+                    _password = _inputPassword.strip()
+                    _FINISH = True
+        if _FINISH:
+            print("\n")
+            _rst = lib.AsciArt.FnConfirmChange(MsgStr=f"Save {_fc + _ServerName + _fw} with code {_fc +  _code + _fw} ?",YesTxt='Yes',NoText='No try again')
+            if _rst == None:
+                continue
+            elif _rst:
+                if ServerLIST.get(_group,False) is False:
+                    ServerLIST[_group] = {}
+                    ServerLIST[_group]["servers"] = {}
+                ServerLIST[_group]["servers"][_code] = {}
+                ServerLIST[_group]["servers"][_code]["server_name"] = _ServerName
+                ServerLIST[_group]["servers"][_code]["ip"] = _ip
+                ServerLIST[_group]["servers"][_code]["port"] = _port
+                ServerLIST[_group]["servers"][_code]["user"] = _user
+                ServerLIST[_group]["servers"][_code]["tags"] = _tags
+                ServerLIST[_group]["servers"][_code]["icon"] = _icon
+                ServerLIST[_group]["servers"][_code]["authentication"] = _authentication
+                if _authentication == 'password':
+                    ServerLIST[_group]["servers"][_code]["password"] = _password
+                elif _authentication == 'key_file':
+                    ServerLIST[_group]["servers"][_code]["key_file"] = _key_file
+                try:
+                    with open(ServerConfigFile, 'w') as json_file:
+                        json.dump(ServerLIST, json_file, indent=4)
+                        print(f"{_B}{_fw}\nTunnel [ {_fEx_g}{_ServerName}{_fw} ] Saved Successfully{_reset}")
+                        lib.BaseFunction.PressEnterToContinue()
+                        return True
+                except:
+                    print(f"{_fr}Error on Update [ {ServerConfigFile} ] operation Faild{_reset}\n")
+                    lib.BaseFunction.PressEnterToContinue()
+                    return False    
+            else:
+                _ServerName = ''
+                _ip = ''
+                _port = ''
+                _user = ''
+                _tags = []
+                _code = ''
+                _group = ''
+                _icon = ''    
+                _authentication = ''
+                _key_file = ''
+                _password = ''
+                _FINISH = False
+
+
+                
+
+
+def PrintListof_Emoji():    
+    IconInLine = 0
+    MsgStr = ''
+    for _em in lib.AsciArt.LIST_OF_EMOJI:
+        MsgStr = MsgStr + f' {_em} '
+        if IconInLine == 20:
+            MsgStr =  MsgStr + '\n'
+            IconInLine = 0
+        else:
+            IconInLine += 1
+    print(MsgStr)
+
+
+def ListofTags(ServerList):    
+    SetofTags = set()
+    for _g in ServerList:
+        _Servers = ServerList[_g]['servers']
+        for _s in _Servers:
+            TagsList = _Servers[_s]['tags']
+            for tag in TagsList:
+                SetofTags.add(tag.upper())
+    ListOfTags = list(SetofTags)
+
+    Count = 0
+    TagsinLine = 0
+    TagStr = ''
+    for tag in ListOfTags:
+        TagStr = TagStr +  f'{_bEx_bl}{_fw} {tag.upper()} {_reset} '
+        if TagsinLine == 10:
+            TagStr = TagStr + '\n'
+            TagsinLine = 0
+        Count +=1
+    return TagStr
+
+def FnListOfGroup(ServerList):
+    ServerLst = []
+    for Group in ServerList:
+        ServerLst.append(Group)
+    return ServerLst
+
+
+def ServerCodeIsUniq(NewCode = '',ServerLIst= {}):
+    for _group in ServerLIst:
+        GroupDict = ServerLIst[_group]["servers"]
+        for _s in GroupDict:
+            if _s.strip().lower() == NewCode.lower().strip():
+                return False
+    return True
+
+
+def EditServerConnection(ServerCode):
+    _Rst = GetServerDictbyCode(Code=ServerCode)
+    ServerDict = _Rst[0]
+    Group = _Rst[1]
+    _Msg = ''
+    GetName = GetIp = GetPort = GetUser = GetTags = GetIcon = GetAuthentication = GetAuthentication_step2 =  False
+    FINISH = False
+    if ServerDict == None:
+        return False, 'Error In Find Server For Edit'
+    while True:
+        lib.BaseFunction.clearScreen()
+        lib.Logo.SshToolsLogo()
+        if _Msg != '':
+            lib.AsciArt.BorderIt(Text=_Msg,BorderColor=_fr,TextColor=_fy)
+            _Msg = ''            
+        print(f"\n{_B}{_fw}Edit Server Connection ...{_reset}")
+        print(f'\n{_fw}Group Name     : {_fw}{Group}{_reset}')
+        print(f'{_fw}Code           : {_fw}{ServerCode}{_reset}')
+        print(f'{_fw}Server Name    : {_fy}{ServerDict["server_name"]}{_reset}')
+        print(f'{_fw}Icon           : {_fy}{ServerDict["icon"]}{_reset}')
+        print(f'{_fw}Server IP      : {_fy}{ServerDict["ip"]}{_reset}')
+        print(f'{_fw}Server User    : {_fy}{ServerDict["user"]}{_reset}')
+        print(f'{_fw}Server Port    : {_fy}{ServerDict["port"]}{_reset}')
+        print(f'{_fw}Tags:          : {_fy}{ServerDict["tags"]}{_reset}')
+        print(f'{_fw}Authentication : {_fy}{ServerDict["authentication"]}{_reset}')
+        if GetName is False:
+            NameInputed = input(f'\n{_B}{_fw}Enter Name [ {_fy}{ServerDict["server_name"]} {_fw}]{_reset} > ')
+            if NameInputed.strip() == '':
+                GetName = True
+            else:
+                ServerDict['server_name'] = NameInputed.lower()
+                GetName = True
+        elif GetIp is False:
+            IpInputed  = input(f'\n{_B}{_fw}Enter ip [ {_fy}{ServerDict["ip"]} {_fw}]{_reset} > ')
+            if IpInputed.strip() == '':
+                GetIp = True
+            else:
+                GetIp = True
+                ServerDict['ip'] = IpInputed.strip()
+        elif GetUser is False:
+            UserInputed = input(f'\n{_B}{_fw}Enter Usernane [ {_fy}{ServerDict["user"]} {_fw}]{_reset} > ')
+            if UserInputed.strip == '':
+                GetUser = True
+            else:
+                GetUser = True
+                ServerDict['user'] = UserInputed.strip()
+        elif GetPort is False:
+            PortInputed = input(f'\n{_B}{_fw}Enter ssh port [ {_fy}{ServerDict["port"]} {_fw}]{_reset} > ')
+            if PortInputed.strip() == '':
+                GetPort = True
+            else:
+                try:
+                    _port = int(PortInputed)
+                except:
+                    _Msg = 'SSH Port is not a valid number'
+                    continue
+                if not (1 <= _port <= 65535):
+                    _Msg = 'SSH Port is out of valid range (1-65535)'
+                    continue
+                GetPort = True
+                ServerDict['port'] = _port
+        elif GetTags is False:
+            _Tagst = ListofTags(ServerList=SERVER_LIST)
+            print(f'\n\n{_D}{_fw}Existed Tags {_reset}{_Tagst}')
+            TagsInputed = input(f'\n{_B}{_fw}Enter Server Tag/s [ {_fy}{ServerDict["tags"]} {_fw}]{_reset} > ')
+            if TagsInputed.strip() == '':
+                GetTags = True
+            else:
+                TagsInputed = TagsInputed.split(' ')
+                TagList = []
+                for _t in TagsInputed:
+                    TagList.append(_t.upper())
+                ServerDict['tags'] = TagList
+                GetTags = True
+        elif GetIcon is False:
+            print('\n')
+            PrintListof_Emoji()
+            IconInputed = input(f'\n{_B}{_fw}Select icon [ {_fy}{ServerDict["icon"]} {_fw}]{_reset} > ')
+            if IconInputed.strip() == '':
+                GetIcon = True
+            else:
+                if len(IconInputed) > 1 :
+                    _Msg = 'The number of characters allowed for an icon is a number.'
+                    continue
+                else:
+                    ServerDict['icon'] = IconInputed.strip()
+                    GetIcon = True
+        elif GetAuthentication is False:
+            _authentication = ServerDict["authentication"]
+            if _authentication.strip() == '':
+                _authentication = 'defualt'
+            authenticationInputed = input(f'\n{_B}{_fw}Select Authentication Method [ {_fy}{_authentication} {_fw}] for Change [ {_fr}C{_fw} ]{_reset} > ')
+            if authenticationInputed.strip() == '':
+                GetAuthentication = True
+            elif authenticationInputed.strip().lower() == 'c':
+                menuItem = []
+                menuItem.append('Use defualt authentication')
+                menuItem.append('Enter Path on key file')
+                menuItem.append('Enter Password')
+                UserSelect = lib.AsciArt.GenerateMenu(Titel='Authentication Method',
+                                            InputMsg='Select Authentication method >',
+                                            MenuList=menuItem)           
+                if UserSelect == 'q':
+                    lib.BaseFunction.FnExit()
+                elif UserSelect == 'b':
+                    continue
+                elif UserSelect == '1':
+                    _authentication = 'defualt'
+                    GetAuthentication = True                    
+                    GetAuthentication_step2 = True
+                    ServerDict['authentication'] = ''
+                    ServerDict['password'] = ''
+                    ServerDict['key_file'] = ''
+                    FINISH = True
+                    continue
+                elif UserSelect == '2':
+                    _authentication = 'key_file'
+                    GetAuthentication = True
+                    continue
+                elif UserSelect == '3':
+                    _authentication = 'password'
+                    GetAuthentication = True
+                    continue
+        elif GetAuthentication_step2 is False:            
+            if _authentication == 'key_file':
+                _key_file = ServerDict.get('key_file','')
+                if _key_file == '':
+                    _inputkeyfile = input (f'\n{_B}{_fw}Enter Path of {_fc}Key file{_fw} > {_reset}')
+                    if _inputkeyfile.strip() == '':
+                        continue
+                    else:
+                        if not os.path.isfile(_inputkeyfile.strip()):
+                            _Msg = f"The specified key file does not exist: {_inputkeyfile}\nPlease check the path and try again."
+                            continue
+                        else:
+                            _key_file = _inputkeyfile.strip()
+                            GetAuthentication_step2 = True
+                            ServerDict['key_file'] = _key_file.strip()
+                            FINISH = True
+            elif _authentication == 'password':
+                _password = ServerDict.get('password','')
+                if _password == '':
+                    _inputPassword = input (f'\n{_B}{_fw}Enter {_fc}Password{_fw} > {_reset}')
+                    if _inputPassword == '':
+                        continue
+                    else:
+                        _password = _inputPassword.strip()
+                        GetAuthentication_step2 = True
+                        ServerDict['password'] = _password.strip()
+                        FINISH = True
+            elif _authentication == 'defualt':
+                ServerDict['authentication'] = ''
+                ServerDict['password'] = ''
+                ServerDict['key_file'] = ''
+                FINISH = True
+
+
+        if FINISH:
+            print("\n")
+            rst = lib.AsciArt.FnConfirmChange(MsgStr="Save Change/s ?",YesTxt="Yes, SaveIt",NoText="No,Cancel")
+            if rst:                
+                SERVER_LIST[Group]['servers'][ServerCode]['server_name'] = ServerDict['server_name']
+                SERVER_LIST[Group]['servers'][ServerCode]['ip'] = ServerDict['ip']
+                SERVER_LIST[Group]['servers'][ServerCode]['port'] = ServerDict['port']
+                SERVER_LIST[Group]['servers'][ServerCode]['user'] = ServerDict['user']
+                SERVER_LIST[Group]['servers'][ServerCode]['tags'] = ServerDict['tags']
+                SERVER_LIST[Group]['servers'][ServerCode]['icon'] = ServerDict['icon']
+                SERVER_LIST[Group]['servers'][ServerCode]['ip'] = ServerDict['ip']
+                SERVER_LIST[Group]['servers'][ServerCode]['authentication'] = ServerDict['authentication']
+                if ServerDict['authentication'] == 'password':
+                    SERVER_LIST[Group]['servers'][ServerCode]['password'] = ServerDict['password']
+                    SERVER_LIST[Group]['servers'][ServerCode]['key_file'] = ''
+                elif ServerDict['authentication'] == 'key_file':
+                    SERVER_LIST[Group]['servers'][ServerCode]['password'] = ''
+                    SERVER_LIST[Group]['servers'][ServerCode]['key_file'] = ServerDict['key_file']
+                elif ServerDict['authentication'] in ['','defualt']:
+                    SERVER_LIST[Group]['servers'][ServerCode]['authentication'] = ''
+                    SERVER_LIST[Group]['servers'][ServerCode]['password'] = ''
+                    SERVER_LIST[Group]['servers'][ServerCode]['key_file'] = ''
+                SaveRst = lib.BaseFunction.SaveJsonFile(JsonFile=ServerConfigFile,JsonData=SERVER_LIST)
+                if SaveRst[0]:
+                    print(f"{_B}{_fw}\nTunnel [ {_fEx_g}{ServerDict['server_name']}{_fw} ] Saved Successfully{_reset}")
+                    lib.BaseFunction.PressEnterToContinue()
+                    return True
+                else:
+                    print(f"Error is Saved Tunnel [ {SaveRst[1]} ]")
+
+                
+                
+
+
+
+
+
+
+                        
+
+
+
+
+
+                
+
+
+        
+                
+
+
+
 
 
 if __name__ == "__main__":        
     print(f"{_B}{_fy}You should not run this file directly")
+
+
