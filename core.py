@@ -29,7 +29,7 @@ if os.path.exists(SSHKEY) == False:
     lib.BaseFunction.clearScreen()
     lib.Logo.SshToolsLogo()
     lib.AsciArt.BorderIt(Text=f'canot find the SSH key File ({SSHKEY})',BorderColor=_fr,TextColor=_fw)
-    lib.BaseFunction.FnExit(1)
+    lib.BaseFunction.FnExit()
 
 def RefreshServerList():
     global SERVER_LIST

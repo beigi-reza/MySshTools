@@ -3,7 +3,7 @@
     "def_ssh_user": "root",
     "def_ssh_key": "",
     "Tag_View": true,
-    "SSHKEY": "/opt/MySshTools/key/id_rsa",
+    "SSHKEY": "/home/beigi/myApp/MySshTools/key/id_rsa",
     "api_config": {
         "encryption_algorithm": "HS256",
         "api_secret_key": "xcvbcvbcv cvbcvbcvbcbcbcb",

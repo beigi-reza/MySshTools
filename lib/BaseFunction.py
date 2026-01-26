@@ -563,7 +563,7 @@ def PrintMessage(messageString : str,MsgType="notif",BackgroudMsg = True,Tremina
 
 def FnExit(Msg="",ErrorCode = 0):
     if Msg != "":                        
-        print(f'\n\n{_r}{Msg}{_reset}')             
+        print(f'\n\n{Msg}{_reset}')             
     sys.exit(ErrorCode)
 
 def convert_seconds_to_minutes(seconds):

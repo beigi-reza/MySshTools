@@ -64,14 +64,14 @@ def MainMenu(Msg = ''):
             print("")
             lib.AsciArt.BorderIt(Text=Msg,BorderColor=_fy,TextColor=_fEx_r)
             Msg = ''
-        print(f'\n\n{_fw}( {_fc}c {_fw}) Create Tunnel{_reset}')        
+        print(f'\n\n{_fw}( {_fc}c {_fw}) Create tu{_reset}')        
         commandList = ['','c','q']
         if len(TUNNEL_LIST) > 0:
             commandList = ['q','s','d','r','','c','0','#']
             print(f'{_fw}( {_fb}s {_fw}) Start all Tunnel{_reset}')        
             print(f'{_fw}( {_fb}d {_fw}) Drop all Tunnel{_reset}')
             print(f'{_fw}( {_fb}r {_fw}) Restart all Tunnel{_reset}')            
-            print(f'{_fw}( {_fb}c {_fw}) Configuration {_reset}')
+            print(f'{_fw}( {_fb}x {_fw}) Configuration {_reset}')
             print(f'{_fw}( {_fy}* {_fw}) Enter tunnel {_fy}code{_fw} for Tunnel Detail{_reset}')
                         
         print(f'\n{_D}# for change View{_reset}')        
@@ -87,7 +87,7 @@ def MainMenu(Msg = ''):
             elif UserInput.strip().lower() == 'r':                
                 DropAllSShTunnel()
                 StartAllTunnel()
-            elif UserInput.strip().lower() == 'c':
+            elif UserInput.strip().lower() == 'x':
                 Configuration_Menu()
             elif UserInput.strip() == 'c':
                 TunnelMode = CreateTunnelModeMenu()

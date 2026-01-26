@@ -3,13 +3,13 @@ import lib.BaseFunction
 import lib.Logo
 import lib.AsciArt
 import json
-from core import current_directory
 from color.Style import _B,_D,_N,_reset
 from color.Back import _bw,_by,_bb,_bbl,_br,_bc,_bg,_bm,_brst,_bEx_w,_bEx_y,_bEx_b,_bEx_bl,_bEx_r ,_bEx_c ,_bEx_g ,_bEx_m ,_b_rest
 from color.Fore import _fw,_fy,_fb,_fbl,_fr,_fc,_fg,_fm,_fEx_w,_fEx_y,_fEx_b,_fEx_bl,_fEx_r,_fEx_c,_fEx_g,_fEx_m,_f_reset
 
-old_file_Name = 'ServerList.json'
-New_File_Name = "ServerList-cnv.json"
+current_directory = os.path.dirname(os.path.realpath(__file__))
+old_file_Name = 'ServerList-old.json'
+New_File_Name = "ServerList.json"
 
 
 OldPath = os.path.join(current_directory,f'conf/{old_file_Name}')
@@ -64,7 +64,7 @@ def ConverIt():
 rst = ConverIt()
 if rst[0]:
     if lib.BaseFunction.SaveJsonFile(JsonData=rst[1],JsonFile=NewPath,Verbus=True):
-        print(f"File : [{NewPath}] Created Successfully\n Convert [ {rst[3]} ] Server Connection Successfully.")
+        print(f"File : [{NewPath}] Created Successfully\n Convert [ {rst[2]} ] Server Connection Successfully.")
 
 else:
     print(rst[1])
