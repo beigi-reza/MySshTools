@@ -40,7 +40,7 @@ TELEGRAM_BOT_TOKEN = TelegramJsonConfig.get('bot_token','')
 Telegram_STICKER = TelegramJsonConfig.get('stickers','')
 
 ###
-TELEGRAM_BOT_TOKEN= '8339475059:AAHcclq2qcA3PLXB388Vqc-q-36q3jx2Y5g'
+#TELEGRAM_BOT_TOKEN= ''
 ###
 
 WAITING_FILE = 1
