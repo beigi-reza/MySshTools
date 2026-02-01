@@ -67,7 +67,7 @@ def MainMenu(Msg = ''):
         print(f'\n\n{_fw}( {_fc}c {_fw}) Create tu{_reset}')        
         commandList = ['','c','q']
         if len(TUNNEL_LIST) > 0:
-            commandList = ['q','s','d','r','','c','0','#']
+            commandList = ['q','s','d','r','','c','0','#','x']
             print(f'{_fw}( {_fb}s {_fw}) Start all Tunnel{_reset}')        
             print(f'{_fw}( {_fb}d {_fw}) Drop all Tunnel{_reset}')
             print(f'{_fw}( {_fb}r {_fw}) Restart all Tunnel{_reset}')            
